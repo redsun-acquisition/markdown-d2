@@ -3,8 +3,9 @@
 `markdown-d2` draws [D2](https://d2lang.com) diagrams in a Python-Markdown
 site. You write a diagram in a `d2` code block, and when the site is built the
 block becomes a picture, drawn twice so it follows the site's light and dark
-theme. A diagram with several steps gets buttons to move through them, and any
-diagram can be opened full screen to zoom and pan.
+theme. A diagram with several steps gets buttons to move through them, with a
+fade or a morph from one step to the next, and any diagram can be opened full
+screen to zoom and pan.
 
 Everything happens when the site is built, so your readers download no extra
 software. A broken diagram stops the build with a message naming the page, the
@@ -73,6 +74,7 @@ as the layout engine or sketch mode. The formatter takes these:
 | `errors` | `raise` | `raise` stops the build on a broken diagram; `show` draws the error in the page |
 | `timeout` | `60` | seconds to wait for one picture |
 | `node` | the Node of `nodejs-wheel-binaries` | the Node program that draws the pictures |
+| `transition` | `fade` | how a diagram changes between steps: `none`, `fade` or `morph`; a block can set its own with `transition="morph"` |
 
 ## Developing
 

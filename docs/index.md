@@ -59,6 +59,31 @@ steps: {
 ```
 ````
 
+Each new step fades in. With `transition="morph"`, the shapes two steps share
+slide to their new places instead, so the reader can follow what moved, while
+the new shapes fade in. `transition="none"` switches at once. Readers who
+asked their system for less motion always get the switch without animation.
+
+```d2 title="A morph" transition="morph"
+direction: right
+browser
+steps: {
+  1: { server; browser -> server }
+  2: { cache; cache -> browser }
+}
+```
+
+````text
+```d2 title="A morph" transition="morph"
+direction: right
+browser
+steps: {
+  1: { server; browser -> server }
+  2: { cache; cache -> browser }
+}
+```
+````
+
 ## Tooltips and links
 
 A `tooltip` shows when the reader points at a shape, and a `link` makes the
@@ -141,6 +166,7 @@ such as the layout engine or sketch mode. The formatter takes these:
 | `errors` | `raise` | `raise` stops the build on a broken diagram; `show` draws the error in the page |
 | `timeout` | `60` | seconds to wait for one picture |
 | `node` | the Node of `nodejs-wheel-binaries` | the Node program that draws the pictures |
+| `transition` | `fade` | how a diagram changes between steps: `none`, `fade` or `morph`; a block can set its own with `transition="morph"` |
 
 In `zensical.toml`, you pass them through the formatter:
 
