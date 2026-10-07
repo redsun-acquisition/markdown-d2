@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "markdown-d2"
 dynamic = ["version"]
-description = "D2 diagrams for Python-Markdown, rendered when the site is built."
+description = "Render D2 diagrams to SVG at build time in Python-Markdown and Zensical sites, in light and dark themes."
 readme = "README.md"
 license = "Apache-2.0"
 authors = [{ name = "Jacopo Abramo" }]
