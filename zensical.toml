@@ -1,0 +1,20 @@
+[project]
+site_name = "markdown-d2"
+docs_dir = "docs"
+site_dir = "site"
+
+[project.theme]
+language = "en"
+
+[[project.theme.palette]]
+scheme = "default"
+toggle = { icon = "lucide/sun", name = "Switch to dark mode" }
+
+[[project.theme.palette]]
+scheme = "slate"
+toggle = { icon = "lucide/moon", name = "Switch to light mode" }
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "d2", class = "d2", format = { object = "markdown_d2.formatter", kwds = { root = "docs" } }, validator = "markdown_d2.validator" },
+]

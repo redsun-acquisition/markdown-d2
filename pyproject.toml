@@ -82,7 +82,7 @@ commands = [
 
 [tool.tox.env.docs]
 dependency_groups = ["dev", "docs"]
-commands = [["zensical", "build", "--strict"]]
+commands = [["zensical", "build", "--strict", "--clean"]]
 
 [dependency-groups]
 dev = [
