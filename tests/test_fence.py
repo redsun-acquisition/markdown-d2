@@ -13,9 +13,16 @@ import pytest
 from pymdownx.superfences import SuperFencesException
 
 from markdown_d2 import formatter
+from markdown_d2._fence import describe
 from markdown_d2._paths import VERSION, d2_version
+from markdown_d2._renderer import D2Error
 
 ICON = b'<svg xmlns="http://www.w3.org/2000/svg"/>'
+GRADIENT = """```d2
+a: { style.fill: "linear-gradient(red, blue)"; style.shadow: true }
+a -> b
+steps: { 1: { c } }
+```"""
 PAGE = """
 ```d2 title="Build steps"
 svc_board
@@ -161,3 +168,28 @@ def test_carry_the_versions_in_the_pickle() -> None:
 
     assert d2_version().encode() in pickled
     assert VERSION.encode() in pickled
+
+
+def test_give_every_svg_its_own_ids(page: Callable[..., str]) -> None:
+    """Make ids unique across copies, themes and boards, with references kept."""
+    html = page(f"{GRADIENT}\n\n{GRADIENT}")
+
+    ids = re.findall(r'\bid="([^"]+)"', html)
+    references = re.findall(r'(?:url\(#|href="#)([^")]+)', html)
+    assert len(ids) == len(set(ids))
+    assert references and set(references) <= set(ids)
+
+
+def test_stop_when_the_cache_cannot_be_written(
+    page: Callable[..., str], tmp_path: Path
+) -> None:
+    """Raise, naming the diagram, when the cache folder is a file."""
+    (tmp_path / "taken").write_text("", encoding="utf-8")
+
+    with pytest.raises(SuperFencesException, match='diagram starting "a"'):
+        page("```d2\na\n```", cache_dir=tmp_path / "taken")
+
+
+def test_keep_a_d2_message_without_a_position() -> None:
+    """Report a D2 message that names the file but no line as it is."""
+    assert describe(D2Error(["index.d2: odd"])) == "index.d2: odd"

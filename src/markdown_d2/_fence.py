@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import functools
 import html
 import json
 import re
@@ -21,8 +23,9 @@ if TYPE_CHECKING:
 
 VARIANTS: tuple[Literal["light"], Literal["dark"]] = ("light", "dark")
 OPTIONS = {"title"}
-D2_POSITION = "index.d2:"
+D2_POSITION = re.compile(r"^index\.d2:(\d+):(\d+):(.*)$", re.DOTALL)
 VIEW_BOX = re.compile(r'^<svg (?![^>]*\bwidth=)([^>]*?)viewBox="0 0 ([\d.]+) ([\d.]+)"')
+ID = re.compile(r'\bid="([^"]+)"')
 
 
 @dataclass(frozen=True)
@@ -82,18 +85,38 @@ class Formatter:
         if self._renderer is None:
             self._renderer = Renderer(self._command, self._timeout)
         settings = self._settings
-        name = block_name(source, options)
-        page = page_path(md)
+        page = zensical_page(md)
         try:
-            figure = render_figure(source, options, settings, self._renderer)
-        except (D2Error, SourceError, RendererError, ValueError) as error:
+            boards = render_boards(
+                source, options, settings, self._renderer, self._versions
+            )
+        except (D2Error, SourceError, RendererError, ValueError, OSError) as error:
+            where = f"{page.path}: " if page is not None else ""
             message = (
-                f"markdown-d2: {page + ': ' if page else ''}{name}: {describe(error)}"
+                f"markdown-d2: {where}{block_name(source, options)}: {describe(error)}"
             )
             if settings.errors == "show":
-                return f'<div class="markdown-d2-error" role="alert"><pre>{html.escape(message)}</pre></div>'
+                return (
+                    '<div class="markdown-d2-error" role="alert">'
+                    f"<pre>{html.escape(message)}</pre></div>"
+                )
             raise SuperFencesException(message) from error
-        return assets_once(md, settings) + figure
+        parts = []
+        for step, (board, svgs) in enumerate(boards, start=1):
+            light, dark = (unique_ids(svgs[variant], md) for variant in VARIANTS)
+            parts.append(
+                f'<div class="markdown-d2-board" data-step="{step}" '
+                f'data-name="{html.escape(board)}">'
+                f'<div class="markdown-d2-light">{light}</div>'
+                f'<div class="markdown-d2-dark">{dark}</div></div>'
+            )
+        title = options.get("title")
+        label = f' aria-label="{html.escape(title)}"' if title else ""
+        caption = f"<figcaption>{html.escape(title)}</figcaption>" if title else ""
+        figure = (
+            f'<figure class="markdown-d2"{label}>{"".join(parts)}{caption}</figure>'
+        )
+        return assets_once(page, settings) + figure
 
 
 def validator(
@@ -160,12 +183,11 @@ def block_name(source: str, options: dict[str, Any]) -> str:
     return f'diagram starting "{first}"'
 
 
-def page_path(md: Markdown) -> str | None:
+def zensical_page(md: Markdown) -> Any:
     """Return the page Zensical is rendering, or `None` outside Zensical."""
     if "rendering_context" not in md.preprocessors:
         return None
-    page = getattr(md.preprocessors["rendering_context"], "page", None)
-    return getattr(page, "path", None)
+    return getattr(md.preprocessors["rendering_context"], "page", None)
 
 
 def describe(error: Exception) -> str:
@@ -179,16 +201,21 @@ def describe(error: Exception) -> str:
 
 def position(message: str) -> str:
     """Turn `index.d2:4:3: text` into `line 4, column 3: text`."""
-    if not message.startswith(D2_POSITION):
+    match = D2_POSITION.match(message)
+    if match is None:
         return message
-    line, column, text = message.removeprefix(D2_POSITION).split(":", 2)
+    line, column, text = match.groups()
     return f"line {line}, column {column}:{text}"
 
 
-def render_figure(
-    source: str, options: dict[str, Any], settings: Settings, renderer: Renderer
-) -> str:
-    """Return the figure of one block.
+def render_boards(
+    source: str,
+    options: dict[str, Any],
+    settings: Settings,
+    renderer: Renderer,
+    versions: tuple[str, str],
+) -> list[tuple[str, dict[str, str]]]:
+    """Return each board of one block with its light and dark SVG.
 
     Raises
     ------
@@ -199,7 +226,6 @@ def render_figure(
     if unknown:
         raise ValueError(f'unknown option "{unknown[0]}"; set it in d2-config instead')
     files = prepare(source, settings.root)
-    versions = (d2_version(), VERSION)
     source_key = key(files, *versions)
     listed = settings.cache.get(f"{source_key}.boards.json")
     if listed is None:
@@ -207,12 +233,14 @@ def render_figure(
         settings.cache.put(f"{source_key}.boards.json", json.dumps(boards))
     else:
         boards = json.loads(listed)
-    parts = []
-    for step, board in enumerate(boards, start=1):
-        svgs = {}
+    rendered = []
+    for board in boards:
+        svgs: dict[str, str] = {}
         for variant in VARIANTS:
+            # the renderer picks the theme of the variant itself; the key only
+            # needs the one that applies
             theme = settings.light_theme if variant == "light" else settings.dark_theme
-            name = key(files, board, variant, theme, *versions)
+            name = key(source_key, board, variant, theme)
             svg = settings.cache.get(f"{name}.svg")
             if svg is None:
                 svg = renderer.render(
@@ -225,15 +253,8 @@ def render_figure(
                 )
                 settings.cache.put(f"{name}.svg", svg)
             svgs[variant] = sized(svg)
-        parts.append(
-            f'<div class="markdown-d2-board" data-step="{step}" data-name="{html.escape(board)}">'
-            f'<div class="markdown-d2-light">{svgs["light"]}</div>'
-            f'<div class="markdown-d2-dark">{svgs["dark"]}</div></div>'
-        )
-    title = options.get("title")
-    label = f' aria-label="{html.escape(title)}"' if title else ""
-    caption = f"<figcaption>{html.escape(title)}</figcaption>" if title else ""
-    return f'<figure class="markdown-d2"{label}>{"".join(parts)}{caption}</figure>'
+        rendered.append((board, svgs))
+    return rendered
 
 
 def sized(svg: str) -> str:
@@ -253,30 +274,45 @@ def sized(svg: str) -> str:
     return VIEW_BOX.sub(add_size, svg, count=1)
 
 
-def assets_once(md: Markdown, settings: Settings) -> str:
+def unique_ids(svg: str, md: Markdown) -> str:
+    """Return *svg* with a suffix on every id and reference to it.
+
+    The suffix counts the SVGs *md* has produced, so no two SVGs on one page
+    share an id, which would make a gradient or an arrowhead point into a
+    hidden copy.
+    """
+    ids = set(ID.findall(svg))
+    if not ids:
+        return svg
+    count = getattr(md, "markdown_d2_svgs", 0) + 1
+    md.markdown_d2_svgs = count  # type: ignore[attr-defined]
+    names = "|".join(re.escape(name) for name in sorted(ids, key=len, reverse=True))
+    pattern = re.compile(rf"""(\bid="|url\(["']?#|href="#)({names})(?=["')])""")
+    return pattern.sub(lambda match: f"{match[1]}{match[2]}-{count}", svg)
+
+
+@functools.cache
+def assets(dark_selector: str) -> str:
+    """Return the inline CSS and script of the figures."""
+    css = (ASSETS / "d2.css").read_text(encoding="utf-8")
+    script = (ASSETS / "d2.js").read_text(encoding="utf-8")
+    return (
+        f"<style data-markdown-d2>{css.replace('DARK_SELECTOR', dark_selector)}</style>"
+        f"<script data-markdown-d2>{script}</script>"
+    )
+
+
+def assets_once(page: Any, settings: Settings) -> str:
     """Return the inline CSS and script, once per Zensical page.
 
     Outside Zensical there is no page to mark, so every figure carries them
     and the script sets itself up once.
     """
-    css = (ASSETS / "d2.css").read_text(encoding="utf-8")
-    css = css.replace("DARK_SELECTOR", settings.dark_selector)
-    script = (ASSETS / "d2.js").read_text(encoding="utf-8")
-    tags = (
-        f"<style data-markdown-d2>{css}</style>"
-        f"<script data-markdown-d2>{script}</script>"
-    )
-    if "rendering_context" not in md.preprocessors:
-        return tags
-    page = getattr(md.preprocessors["rendering_context"], "page", None)
-    if page is None:
-        return tags
     # Zensical makes a new page object for every render, so a mark on it
     # resets when `zensical serve` renders the page again
-    if getattr(page, "markdown_d2_assets", False):
-        return ""
-    try:
-        page.markdown_d2_assets = True
-    except AttributeError:
-        return tags
-    return tags
+    if page is not None:
+        if getattr(page, "markdown_d2_assets", False):
+            return ""
+        with contextlib.suppress(AttributeError):
+            page.markdown_d2_assets = True
+    return assets(settings.dark_selector)
