@@ -116,6 +116,10 @@ storage: @parts/storage
 ```
 ````
 
+An import inside an imported file is found relative to that file, as D2
+finds it, while an icon path always starts from `root`. Either one leading
+outside `root` stops the build.
+
 An icon must be a file, an SVG, PNG or JPEG under `root`. A URL is refused,
 so building the site never needs the network.
 
