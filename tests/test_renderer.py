@@ -112,16 +112,17 @@ def test_raise_when_node_does_not_answer() -> None:
 def test_render_an_import_with_an_embedded_icon(
     renderer: Renderer, tmp_path: Path
 ) -> None:
-    """Render a diagram whose imported file carries an embedded icon."""
+    """Render an imported file that carries an icon and imports its neighbour."""
     (tmp_path / "parts").mkdir()
     (tmp_path / "parts" / "stage.d2").write_text(
-        "motor: { icon: cam.svg }\n", encoding="utf-8"
+        "motor: { icon: cam.svg }\nhome: @home\n", encoding="utf-8"
     )
+    (tmp_path / "parts" / "home.d2").write_text("origin_shape\n", encoding="utf-8")
     (tmp_path / "cam.svg").write_bytes(b'<svg xmlns="http://www.w3.org/2000/svg"/>')
 
     svg = renderer.render(
         prepare("stage: @parts/stage\n", tmp_path), "", "light", 0, 200, "s"
     )
 
-    assert "motor" in svg
+    assert "motor" in svg and "origin_shape" in svg
     assert "data:image/svg+xml;base64," in svg

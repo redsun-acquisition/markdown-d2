@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import base64
+import posixpath
 import re
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-ICON = re.compile(r'(\bicon\s*:\s*)(?:"([^"\n]*)"|([^\s;}\n]+))')
+ICON = re.compile(
+    r'((?:^|(?<=[{;.]))\s*icon\s*:\s*)(?:"([^"\n]*)"|([^\s;}\n]+))', re.MULTILINE
+)
 IMPORT = re.compile(r"@([A-Za-z0-9_][\w./-]*)")
 TYPES = {
     ".svg": "image/svg+xml",
@@ -23,20 +26,34 @@ class SourceError(Exception):
     """An icon or an import cannot be used."""
 
 
+def inside(reference: str, root: Path) -> Path:
+    """Return the path *reference* names under *root*.
+
+    Raises
+    ------
+    SourceError
+        If the path leads outside *root*.
+    """
+    path = (root / reference).resolve()
+    if not path.is_relative_to(root.resolve()):
+        raise SourceError(f"{reference!r} is outside `root`")
+    return path
+
+
 def resolve_icon(reference: str, root: Path) -> bytes:
     """Return the bytes of the icon file *reference* names under *root*.
 
     Raises
     ------
     SourceError
-        If *reference* is a URL, names no file, or names a file that is not
-        SVG, PNG or JPEG.
+        If *reference* is a URL, names no file, names a file outside
+        *root*, or names a file that is not SVG, PNG or JPEG.
     """
     if "://" in reference:
         raise SourceError(
             f"icons must be files under `root`; URL icons are not enabled: {reference}"
         )
-    path = root / reference
+    path = inside(reference, root)
     if path.suffix.lower() not in TYPES:
         raise SourceError(f"icon {reference!r} is not SVG, PNG or JPEG")
     if not path.is_file():
@@ -61,23 +78,32 @@ def embed_icons(text: str, root: Path) -> str:
 def prepare(source: str, root: Path) -> dict[str, str]:
     """Return the files D2 compiles for one block, keyed as D2 imports them.
 
-    The block is `index.d2`; each file it imports, directly or through
-    another import, is added under its path relative to *root* with `.d2`.
+    The block is `index.d2`. Each file it imports, directly or through
+    another import, is added under its path relative to *root*, found as
+    D2 finds it: relative to the folder of the file that imports it.
 
     Raises
     ------
     SourceError
-        If an icon cannot be embedded.
+        If an icon cannot be embedded, or an import leads outside *root*.
     """
     files = {"index.d2": embed_icons(source, root)}
-    waiting = [source]
+    waiting = [("index.d2", source)]
     while waiting:
-        for name in IMPORT.findall(waiting.pop()):
-            relative = name.removesuffix(".d2") + ".d2"
-            path = root / relative
+        importer, text = waiting.pop()
+        for name in IMPORT.findall(text):
+            relative = (
+                posixpath.normpath(
+                    posixpath.join(
+                        posixpath.dirname(importer), name.removesuffix(".d2")
+                    )
+                )
+                + ".d2"
+            )
+            path = inside(relative, root)
             if relative in files or not path.is_file():
                 continue
-            text = path.read_text(encoding="utf-8")
-            files[relative] = embed_icons(text, root)
-            waiting.append(text)
+            imported = path.read_text(encoding="utf-8")
+            files[relative] = embed_icons(imported, root)
+            waiting.append((relative, imported))
     return files
