@@ -37,7 +37,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - run: uv run --locked playwright install --with-deps chromium
       - run: uv run --locked tox -e browser
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: screenshots
