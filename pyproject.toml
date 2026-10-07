@@ -44,6 +44,10 @@ warn_unreachable = true
 files = "."
 exclude = ["^node_modules/", "^src/markdown_d2/node_modules/", "^site/"]
 
+[[tool.mypy.overrides]]
+module = ["pymdownx.*"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 addopts = "-m 'not browser'"
 markers = ["browser: drives a real browser with Playwright"]
@@ -88,6 +92,7 @@ dev = [
     "pytest>=9.1.1",
     "tox>=4.64.9",
     "tox-uv-bare>=1.36.1",
+    "types-markdown>=3.10.2.20261007",
 ]
 docs = [
     "zensical>=0.0.68",
