@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -48,10 +51,29 @@ jobs:
       - run: uv run --locked tox -e docs
 
   wheel:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v6
       - run: uv build
-      - run: python -c "import sys, zipfile; names = zipfile.ZipFile(sys.argv[1]).namelist(); assert any(n.endswith('node-esm/d2.wasm') for n in names) and any(n.endswith('assets/d2.js') for n in names)" dist/*.whl
       - run: ls -l dist
+      - name: Render a diagram with the installed wheel
+        run: |
+          uv run --isolated --no-project --with dist/*.whl python - <<'EOF'
+          import markdown
+          import markdown_d2
+
+          fence = {"name": "d2", "class": "d2", "format": markdown_d2.formatter(cache_dir=None), "validator": markdown_d2.validator}
+          md = markdown.Markdown(extensions=["pymdownx.superfences"], extension_configs={"pymdownx.superfences": {"custom_fences": [fence]}})
+          html = md.convert("```d2\na -> b\n```")
+          assert "<svg" in html and "<script data-markdown-d2>" in html, html
+          EOF
