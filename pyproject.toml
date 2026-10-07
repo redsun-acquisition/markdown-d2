@@ -1,0 +1,98 @@
+[build-system]
+requires = ["hatchling>=1.27", "hatch-vcs", "nodejs-wheel-binaries>=24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "markdown-d2"
+dynamic = ["version"]
+description = "D2 diagrams for Python-Markdown, rendered when the site is built."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{ name = "Jacopo Abramo" }]
+requires-python = ">=3.11"
+dependencies = [
+    "markdown>=3.11",
+    "nodejs-wheel-binaries>=24.19.0",
+    "pymdown-extensions>=12.1",
+]
+
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/markdown_d2"]
+artifacts = ["src/markdown_d2/node_modules", "src/markdown_d2/assets/d2.js"]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "hatch_build.py"
+
+[tool.ruff.lint]
+extend-select = ["D", "I", "TC", "FA102", "E402", "PLC0415"]
+ignore = ["D100", "D104"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["D101", "D102", "D103", "TC"]
+"tests/**/*.py" = ["D101", "D102", "D103", "TC"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.mypy]
+strict = true
+warn_unreachable = true
+files = "."
+exclude = ["^node_modules/", "^src/markdown_d2/node_modules/", "^site/"]
+
+[tool.pytest.ini_options]
+addopts = "-m 'not browser'"
+markers = ["browser: drives a real browser with Playwright"]
+
+[tool.tox]
+requires = ["tox>=4.28", "tox-uv-bare>=1.36"]
+env_list = ["lint", "types", "tests", "docs"]
+
+[tool.tox.env_run_base]
+runner = "uv-venv-lock-runner"
+dependency_groups = ["dev"]
+
+[tool.tox.env.lint]
+dependency_groups = ["lint"]
+commands = [["prek", "run", "--all-files", "--show-diff-on-failure"]]
+
+[tool.tox.env.types]
+commands = [
+    ["mypy"],
+    ["python", "-m", "nodejs_wheel", "node_modules/typescript/bin/tsc", "-p", "tsconfig.json"],
+    ["python", "-m", "nodejs_wheel", "node_modules/typescript/bin/tsc", "-p", "tsconfig.browser.json", "--noEmit"],
+]
+
+[tool.tox.env.tests]
+commands = [["pytest", "-q", { replace = "posargs", extend = true }]]
+
+[tool.tox.env.browser]
+commands = [
+    ["playwright", "install", "chromium"],
+    ["pytest", "-q", "-m", "browser", { replace = "posargs", extend = true }],
+]
+
+[tool.tox.env.docs]
+dependency_groups = ["dev", "docs"]
+commands = [["zensical", "build", "--strict"]]
+
+[dependency-groups]
+dev = [
+    "hatchling>=1.32.4",
+    "mypy>=2.4.0",
+    "playwright>=1.63.0",
+    "pytest>=9.1.1",
+    "tox>=4.64.9",
+    "tox-uv-bare>=1.36.1",
+]
+docs = [
+    "zensical>=0.0.68",
+]
+lint = [
+    "prek>=0.5.5",
+    "ruff>=0.16.10",
+]

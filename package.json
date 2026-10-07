@@ -1,0 +1,12 @@
+{
+  "name": "markdown-d2",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@d2lang/d2": "0.1.34"
+  },
+  "devDependencies": {
+    "@types/node": "24.x",
+    "typescript": "5.x"
+  }
+}

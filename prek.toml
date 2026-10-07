@@ -1,0 +1,23 @@
+# Configuration file for `prek`, a git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "builtin"
+hooks = [
+  { id = "end-of-file-fixer" },
+  { id = "trailing-whitespace" },
+  { id = "check-yaml" },
+  { id = "check-toml" },
+  { id = "check-added-large-files" },
+  { id = "check-merge-conflict" },
+]
+
+# ruff runs from uv.lock rather than a pinned hook repo, so the hook, tox and
+# CI all run the same ruff version; --only-group keeps the sync to prek and ruff
+[[repos]]
+repo = "local"
+hooks = [
+  { id = "ruff-check", name = "ruff check", language = "system", entry = "uv run --locked --only-group lint ruff check --fix --force-exclude", types_or = ["python", "pyi"], require_serial = true },
+  { id = "ruff-format", name = "ruff format", language = "system", entry = "uv run --locked --only-group lint ruff format --force-exclude", types_or = ["python", "pyi"], require_serial = true },
+]

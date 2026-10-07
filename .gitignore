@@ -1,0 +1,12 @@
+.venv/
+node_modules/
+src/markdown_d2/assets/d2.js
+.cache/
+site/
+dist/
+__pycache__/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+test-results/
