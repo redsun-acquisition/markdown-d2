@@ -91,7 +91,7 @@ class Formatter:
                 f"markdown-d2: {page + ': ' if page else ''}{name}: {describe(error)}"
             )
             if settings.errors == "show":
-                return f'<div class="d2-error" role="alert"><pre>{html.escape(message)}</pre></div>'
+                return f'<div class="markdown-d2-error" role="alert"><pre>{html.escape(message)}</pre></div>'
             raise SuperFencesException(message) from error
         return assets_once(md, settings) + figure
 
@@ -226,14 +226,14 @@ def render_figure(
                 settings.cache.put(f"{name}.svg", svg)
             svgs[variant] = sized(svg)
         parts.append(
-            f'<div class="d2-board" data-step="{step}" data-name="{html.escape(board)}">'
-            f'<div class="d2-light">{svgs["light"]}</div>'
-            f'<div class="d2-dark">{svgs["dark"]}</div></div>'
+            f'<div class="markdown-d2-board" data-step="{step}" data-name="{html.escape(board)}">'
+            f'<div class="markdown-d2-light">{svgs["light"]}</div>'
+            f'<div class="markdown-d2-dark">{svgs["dark"]}</div></div>'
         )
     title = options.get("title")
     label = f' aria-label="{html.escape(title)}"' if title else ""
     caption = f"<figcaption>{html.escape(title)}</figcaption>" if title else ""
-    return f'<figure class="d2"{label}>{"".join(parts)}{caption}</figure>'
+    return f'<figure class="markdown-d2"{label}>{"".join(parts)}{caption}</figure>'
 
 
 def sized(svg: str) -> str:

@@ -48,12 +48,15 @@ def test_render_a_page_then_serve_it_from_the_cache(
     html = page(PAGE)
     again = page(PAGE, node=files / "no-such-node")
 
-    assert html.count('<figure class="d2"') == 2
+    assert html.count('<figure class="markdown-d2"') == 2
     assert 'aria-label="Build steps"' in html
     assert "<figcaption>Build steps</figcaption>" in html
-    assert html.count('class="d2-board"') == 4
+    assert html.count('class="markdown-d2-board"') == 4
     assert 'data-name="steps.1"' in html and 'data-name="steps.2"' in html
-    assert html.count('class="d2-light"') == 4 and html.count('class="d2-dark"') == 4
+    assert (
+        html.count('class="markdown-d2-light"') == 4
+        and html.count('class="markdown-d2-dark"') == 4
+    )
     assert "view_board" in html and "motor_shape" in html
     assert "data:image/svg+xml;base64," + base64.b64encode(ICON).decode() in html
     assert html.count("<style data-markdown-d2>") == 2
@@ -73,14 +76,14 @@ def test_render_the_same_diagram_twice_on_a_page(page: Callable[..., str]) -> No
     """Give a page two figures when it holds the same block twice."""
     html = page("```d2\na -> b\n```\n\n```d2\na -> b\n```")
 
-    assert html.count('<figure class="d2"') == 2
+    assert html.count('<figure class="markdown-d2"') == 2
 
 
 def test_render_an_empty_block(page: Callable[..., str]) -> None:
     """Render an empty block as a figure with one board."""
     html = page("```d2\n```")
 
-    assert html.count('class="d2-board"') == 1
+    assert html.count('class="markdown-d2-board"') == 1
 
 
 @pytest.mark.parametrize(
@@ -116,7 +119,7 @@ def test_show_errors_in_the_page_when_asked(page: Callable[..., str]) -> None:
     """Draw the error in place of the diagram with `errors="show"`."""
     html = page("```d2\na -> \n```", errors="show")
 
-    assert '<div class="d2-error" role="alert">' in html
+    assert '<div class="markdown-d2-error" role="alert">' in html
     assert "connection missing destination" in html
 
 
@@ -139,7 +142,7 @@ def test_survive_pickling(tmp_path: Path) -> None:
         },
     ).convert("```d2\na -> b\n```")
 
-    assert html.count('<figure class="d2"') == 1
+    assert html.count('<figure class="markdown-d2"') == 1
 
 
 def test_give_each_picture_its_natural_size(page: Callable[..., str]) -> None:
@@ -147,7 +150,7 @@ def test_give_each_picture_its_natural_size(page: Callable[..., str]) -> None:
     html = page("```d2\na -> b\n```")
 
     sizes = re.findall(
-        r'<div class="d2-light"><svg [^>]*?width="(\d+)" height="(\d+)"', html
+        r'<div class="markdown-d2-light"><svg [^>]*?width="(\d+)" height="(\d+)"', html
     )
     assert sizes and all(int(width) > 0 and int(height) > 0 for width, height in sizes)
 

@@ -17,23 +17,23 @@ function button(label: string, text: string, onClick: () => void): HTMLButtonEle
 function setUpFigure(figure: HTMLElement): void {
   if (figure.dataset.ready) return;
   figure.dataset.ready = "true";
-  figure.classList.add("d2-ready");
+  figure.classList.add("markdown-d2-ready");
   figure.tabIndex = 0;
-  const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .d2-board"));
+  const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .markdown-d2-board"));
   let current = 0;
   const counter = document.createElement("span");
-  counter.className = "d2-counter";
+  counter.className = "markdown-d2-counter";
   counter.setAttribute("aria-live", "polite");
 
   const show = (index: number): void => {
     current = (index + boards.length) % boards.length;
-    boards.forEach((board, i) => board.classList.toggle("d2-current", i === current));
+    boards.forEach((board, i) => board.classList.toggle("markdown-d2-current", i === current));
     const name = boards[current].dataset.name;
     counter.textContent = `${current + 1} / ${boards.length}${name ? ` · ${name}` : ""}`;
   };
 
   const controls = document.createElement("div");
-  controls.className = "d2-controls";
+  controls.className = "markdown-d2-controls";
   if (boards.length > 1) {
     controls.append(
       button("Previous step", "◀", () => show(current - 1)),
@@ -53,11 +53,11 @@ function setUpFigure(figure: HTMLElement): void {
 
 function openDialog(board: HTMLElement): void {
   const dialog = document.createElement("dialog");
-  dialog.className = "d2-dialog";
+  dialog.className = "markdown-d2-dialog";
   const stage = document.createElement("div");
-  stage.className = "d2-stage";
+  stage.className = "markdown-d2-stage";
   const view = document.createElement("div");
-  view.className = "d2-view";
+  view.className = "markdown-d2-view";
   view.append(...Array.from(board.children).map((child) => child.cloneNode(true)));
   stage.append(view);
 
@@ -92,7 +92,7 @@ function openDialog(board: HTMLElement): void {
   stage.addEventListener("pointerup", () => (dragging = null));
 
   const controls = document.createElement("div");
-  controls.className = "d2-controls";
+  controls.className = "markdown-d2-controls";
   controls.append(
     button("Zoom in", "+", () => zoom(ZOOM_STEP, 0, 0)),
     button("Zoom out", "-", () => zoom(1 / ZOOM_STEP, 0, 0)),
@@ -112,7 +112,7 @@ function openDialog(board: HTMLElement): void {
 }
 
 function setUpFigures(): void {
-  document.querySelectorAll<HTMLElement>("figure.d2").forEach(setUpFigure);
+  document.querySelectorAll<HTMLElement>("figure.markdown-d2").forEach(setUpFigure);
 }
 
 (function start(): void {
