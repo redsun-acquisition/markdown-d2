@@ -1,5 +1,7 @@
 [project]
 site_name = "markdown-d2"
+site_url = "https://redsun-acquisition.github.io/markdown-d2/"
+repo_url = "https://github.com/redsun-acquisition/markdown-d2"
 site_description = "D2 diagrams for Python-Markdown and Zensical sites, drawn when the site is built."
 docs_dir = "docs"
 site_dir = "site"
