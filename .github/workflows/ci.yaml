@@ -52,6 +52,14 @@ jobs:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
       - run: uv run --locked tox -e docs
+      # the publishing job deploys this site rather than building it again,
+      # so what reaches the pages is what was checked
+      - uses: actions/upload-artifact@v6
+        with:
+          name: site
+          path: site/
+          if-no-files-found: error
+          retention-days: 7
 
   wheel:
     strategy:
@@ -129,3 +137,26 @@ jobs:
           name: dist
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+
+  # main and final releases only: a pre-release leaves the site describing the
+  # last final release
+  pages:
+    needs: [lint, docs]
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'release' && !github.event.release.prerelease)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: site/
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site

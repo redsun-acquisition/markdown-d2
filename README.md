@@ -39,11 +39,12 @@ page -> site: build
 ```
 ````
 
-The [documentation](docs/index.md) starts with a
-[tutorial](docs/tutorials/first-diagram.md), then shows how to step through
+The [documentation](https://redsun-acquisition.github.io/markdown-d2/)
+starts with a
+[tutorial](https://redsun-acquisition.github.io/markdown-d2/tutorials/first-diagram/), then shows how to step through
 diagrams, import files and icons, change the look and
-[use `markdown-d2` without `zensical`](docs/how-to/use-python-markdown.md),
-and lists every [setting](docs/reference/settings.md).
+[use `markdown-d2` without `zensical`](https://redsun-acquisition.github.io/markdown-d2/how-to/use-python-markdown/),
+and lists every [setting](https://redsun-acquisition.github.io/markdown-d2/reference/settings/).
 
 ## Developing
 
