@@ -53,14 +53,15 @@ def node_command(node: Path) -> list[str]:
 
 
 def d2_messages(text: str) -> list[str]:
-    """Return the problems in an error D2 sent, one per item when it is a list."""
+    """Return the problems in an error D2 sent, each once, in the order D2 gave them."""
     try:
         items = json.loads(text)
     except json.JSONDecodeError:
         return [text]
     match items:
         case [*entries] if all(isinstance(e, dict) and "errmsg" in e for e in entries):
-            return [str(entry["errmsg"]) for entry in entries]
+            # D2 repeats a problem for each board it checks
+            return list(dict.fromkeys(str(entry["errmsg"]) for entry in entries))
         case _:
             return [text]
 

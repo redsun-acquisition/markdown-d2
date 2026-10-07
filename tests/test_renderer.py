@@ -142,3 +142,15 @@ def test_render_an_import_with_an_embedded_icon(
 
     assert "motor" in svg and "origin_shape" in svg
     assert "data:image/svg+xml;base64," in svg
+
+
+def test_report_a_repeated_d2_error_once(renderer: Renderer) -> None:
+    """Drop a message D2 reports twice for the same place."""
+    source = "vars: { d2-config: { animate-interval: 1000 } }\na\nsteps: { 1: { b } }\n"
+
+    with pytest.raises(D2Error) as caught:
+        renderer.draw({"index.d2": source}, 0, 200, "s")
+
+    assert caught.value.messages == [
+        'index.d2:1:22: "animate-interval" is not a valid config'
+    ]
