@@ -1,0 +1,15 @@
+.d2 { margin: 1em 0; }
+.d2 svg, .d2-dialog svg { display: block; max-width: 100%; height: auto; }
+.d2 .d2-dark, .d2-dialog .d2-dark { display: none; }
+DARK_SELECTOR .d2 .d2-dark, DARK_SELECTOR .d2-dialog .d2-dark { display: block; }
+DARK_SELECTOR .d2 .d2-light, DARK_SELECTOR .d2-dialog .d2-light { display: none; }
+.d2.d2-ready .d2-board:not(.d2-current) { display: none; }
+.d2 .d2-board + .d2-board { margin-top: 1em; }
+.d2.d2-ready .d2-board + .d2-board { margin-top: 0; }
+.d2-controls { display: flex; gap: 0.5em; align-items: center; justify-content: center; margin-top: 0.5em; }
+.d2-controls button, .d2-dialog button { font: inherit; cursor: pointer; }
+.d2-dialog { width: 95vw; height: 95vh; max-width: none; max-height: none; padding: 0; overflow: hidden; }
+.d2-dialog .d2-stage { width: 100%; height: calc(100% - 3em); overflow: hidden; cursor: grab; touch-action: none; }
+.d2-dialog .d2-view { transform-origin: 0 0; }
+.d2-dialog .d2-controls { height: 3em; margin: 0; }
+.d2-error { border: 2px solid #c62828; padding: 0.5em 1em; color: #c62828; }
