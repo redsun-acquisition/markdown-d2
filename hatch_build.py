@@ -35,6 +35,3 @@ class CustomBuildHook(BuildHookInterface[BuilderConfig]):
         shutil.copytree(source / "dist" / "node-esm", target / "dist" / "node-esm")
         tsc = root / "node_modules" / "typescript" / "bin" / "tsc"
         run(node([str(tsc), "-p", str(root / "tsconfig.browser.json")]), "tsc")
-        build_data["artifacts"].extend(
-            ["src/markdown_d2/node_modules", "src/markdown_d2/assets/d2.js"]
-        )
