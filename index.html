@@ -1,0 +1,1371 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="D2 diagrams for Python-Markdown and Zensical sites, drawn when the site is built.">
+      
+      
+      
+        <link rel="canonical" href="https://redsun-acquisition.github.io/markdown-d2/">
+      
+      
+      
+        <link rel="next" href="./tutorials/first-diagram/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="./assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.68">
+    
+    
+      
+        <title>markdown-d2 - markdown-d2</title>
+      
+    
+    
+      
+        
+      
+      <link rel="stylesheet" href="./assets/stylesheets/modern/main.595f2bf5.min.css">
+      
+        
+          
+        
+        <link rel="stylesheet" href="./assets/stylesheets/modern/palette.b27955a4.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&amp;display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_scope.pathname.endsWith("/")||(__md_scope=new URL(__md_scope.pathname+"/",location)),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,_=__md_scope)=>JSON.parse(t.getItem(_.pathname+"."+e)),__md_set=(e,t,_=localStorage,a=__md_scope)=>{try{_.setItem(a.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-hidden="true"></label>
+    <div data-md-component="skip">
+      <a href="#__skip" class="md-skip">
+        Skip to content
+      </a>
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="" title="markdown-d2" class="md-header__button md-logo" aria-label="markdown-d2" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer" aria-label="Navigation">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-menu" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h16"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            markdown-d2
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              markdown-d2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-moon" viewBox="0 0 24 24"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="none" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search" aria-label="Search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog" aria-label="Search">
+  <button type="button" class="md-search__button">
+    Search
+  </button>
+</div>
+      
+    
+    <div class="md-header__source">
+      
+        <a href="https://github.com/redsun-acquisition/markdown-d2" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      
+    </div>
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="" title="markdown-d2" class="md-nav__button md-logo" aria-label="markdown-d2" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-book-open" viewBox="0 0 24 24"><path d="M12 5v16M20.001 19A2 2 0 0 0 22 17V5a2 2 0 0 0-1.999-2L16 3.002A5 5 0 0 0 12 5a5 5 0 0 0-4-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 1.999 2H8a5 5 0 0 1 4 2 5 5 0 0 1 4-2z"/></svg>
+
+    </a>
+    markdown-d2
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/redsun-acquisition/markdown-d2" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2026 Fonticons, Inc.--><path fill="currentColor" d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  markdown-d2
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  markdown-d2
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-go-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Where to go next
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Tutorial
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_2">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Tutorial
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./tutorials/first-diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Draw your first diagram
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  How-to guides
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_3">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  How-to guides
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./how-to/show-steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Show a diagram one step at a time
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./how-to/import-files-and-icons/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Import files and icons
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./how-to/change-the-look/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Change how a diagram looks
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./how-to/fix-a-broken-diagram/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Fix a broken diagram
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./how-to/use-python-markdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Use markdown-d2 without zensical
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Reference
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_4">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Reference
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./reference/settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Settings
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./reference/figure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  The figure
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./reference/d2-features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  D2 features
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./reference/api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Python API
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./explanation/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Glossary
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Explanation
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        
+          <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+            <label class="md-nav__title" for="__nav_5">
+              <span class="md-nav__icon md-icon"></span>
+              
+  
+  Explanation
+
+            </label>
+            <ul class="md-nav__list" data-md-scrollfix>
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="./explanation/how-it-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Drawing diagrams when the site is built
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+            </ul>
+          </nav>
+        
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  
+                    
+                    
+                    
+                      
+                    
+                    
+                      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                      <div class="md-sidebar-button__wrapper">
+                        <label class="md-sidebar-button" for="__toc"></label>
+                      </div>
+                    
+                  
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--secondary" aria-label="On this page">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      On this page
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#where-to-go-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Where to go next
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                <a id="__skip" tabindex="-1"></a>
+                
+                  
+
+  
+  
+
+
+<h1 id="markdown-d2">markdown-d2<a class="headerlink" href="#markdown-d2" title="Permanent link">&para;</a></h1>
+<p><code>markdown-d2</code> turns <a href="https://d2lang.com">D2</a> diagrams into pictures in a site
+built with <a href="explanation/glossary/#zensical"><code>zensical</code></a> or Python-Markdown. You write a diagram as text in a <code>d2</code>
+code block, and the build draws it, once for the light theme and once for the
+dark one. Your readers get the picture with the page: they download no extra
+software, and they can <a href="explanation/glossary/#step">step</a> through the diagram and open it full screen.</p>
+<style data-markdown-d2>.markdown-d2 { margin: 1em 0; }
+.markdown-d2-light > svg, .markdown-d2-dark > svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.markdown-d2 .markdown-d2-dark, .markdown-d2-dialog .markdown-d2-dark { display: none; }
+[data-md-color-scheme="slate"] .markdown-d2 .markdown-d2-dark, [data-md-color-scheme="slate"] .markdown-d2-dialog .markdown-d2-dark { display: block; }
+[data-md-color-scheme="slate"] .markdown-d2 .markdown-d2-light, [data-md-color-scheme="slate"] .markdown-d2-dialog .markdown-d2-light { display: none; }
+.markdown-d2.markdown-d2-ready { display: grid; grid-template-columns: minmax(0, 1fr); }
+.markdown-d2.markdown-d2-ready > .markdown-d2-board { grid-area: 1 / 1; }
+.markdown-d2.markdown-d2-ready > .markdown-d2-board:not(.markdown-d2-current) { visibility: hidden; }
+.markdown-d2 .markdown-d2-board + .markdown-d2-board { margin-top: 1em; }
+.markdown-d2.markdown-d2-ready .markdown-d2-board + .markdown-d2-board { margin-top: 0; }
+.markdown-d2-controls { display: flex; gap: 0.5em; align-items: center; justify-content: center; margin-top: 0.5em; }
+.markdown-d2-controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 2em; height: 2em; font: inherit; cursor: pointer; }
+.markdown-d2-controls button svg { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.markdown-d2-dialog { width: 95vw; height: 95vh; max-width: none; max-height: none; padding: 0; overflow: hidden; }
+.markdown-d2-dialog .markdown-d2-stage { width: 100%; height: calc(100% - 3em); overflow: hidden; cursor: grab; touch-action: none; }
+.markdown-d2-dialog .markdown-d2-view { transform-origin: 0 0; }
+.markdown-d2-dialog .markdown-d2-controls { height: 3em; margin: 0; }
+.markdown-d2-error { border: 2px solid #c62828; padding: 0.5em 1em; color: #c62828; }
+</style><script data-markdown-d2>"use strict";
+const ZOOM_STEP = 1.25;
+const SVG = "http://www.w3.org/2000/svg";
+const ICONS = {
+    previous: "M15 6l-6 6 6 6",
+    next: "M9 6l6 6-6 6",
+    fullScreen: "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5",
+    zoomIn: "M12 5v14M5 12h14",
+    zoomOut: "M5 12h14",
+    close: "M6 6l12 12M18 6 6 18",
+};
+function icon(name) {
+    const svg = document.createElementNS(SVG, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    const path = document.createElementNS(SVG, "path");
+    path.setAttribute("d", ICONS[name]);
+    svg.append(path);
+    return svg;
+}
+function button(label, content, onClick) {
+    const element = document.createElement("button");
+    element.type = "button";
+    element.append(typeof content === "string" ? icon(content) : content.text);
+    element.setAttribute("aria-label", label);
+    element.addEventListener("click", onClick);
+    return element;
+}
+const DURATION = { fade: 250, morph: 450 };
+function visibleSvg(container) {
+    for (const variant of container.querySelectorAll(":scope > .markdown-d2-light, :scope > .markdown-d2-dark")) {
+        if (getComputedStyle(variant).display !== "none")
+            return variant.querySelector("svg");
+    }
+    return null;
+}
+function shapes(svg) {
+    const found = new Map();
+    for (const group of svg.querySelectorAll("g[class]:not(.shape)")) {
+        const name = group.getAttribute("class");
+        if (name && !found.has(name))
+            found.set(name, group);
+    }
+    return found;
+}
+function measure(container) {
+    const svg = visibleSvg(container);
+    const rects = new Map();
+    for (const [name, group] of svg ? shapes(svg) : [])
+        rects.set(name, group.getBoundingClientRect());
+    return rects;
+}
+function play(transition, container, before) {
+    const svg = visibleSvg(container);
+    if (!svg || transition === "none" || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+    }
+    const fadeIn = (element, duration) => {
+        element.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing: "ease-out" });
+    };
+    if (transition === "fade") {
+        fadeIn(svg, DURATION.fade);
+        return;
+    }
+    const units = svg.viewBox.baseVal.width / svg.getBoundingClientRect().width || 1;
+    for (const [name, group] of shapes(svg)) {
+        const old = before.get(name);
+        const now = group.getBoundingClientRect();
+        if (!old) {
+            fadeIn(group, DURATION.morph);
+            continue;
+        }
+        const x = (old.left - now.left) * units;
+        const y = (old.top - now.top) * units;
+        const scaleX = old.width && now.width ? old.width / now.width : 1;
+        const scaleY = old.height && now.height ? old.height / now.height : 1;
+        if (x === 0 && y === 0 && scaleX === 1 && scaleY === 1)
+            continue;
+        group.style.transformBox = "fill-box";
+        group.style.transformOrigin = "0 0";
+        group.animate([
+            { transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})` },
+            { transform: "none" },
+        ], { duration: DURATION.morph, easing: "ease-in-out" });
+    }
+}
+function stepControls(boards, onStep) {
+    let current = 0;
+    const counter = document.createElement("span");
+    counter.className = "markdown-d2-counter";
+    counter.setAttribute("aria-live", "polite");
+    const show = (index) => {
+        current = (index + boards.length) % boards.length;
+        const name = boards[current]?.dataset.name;
+        counter.textContent = `${current + 1} / ${boards.length}${name ? ` (${name})` : ""}`;
+        onStep(current);
+    };
+    const controls = document.createElement("div");
+    controls.className = "markdown-d2-controls";
+    if (boards.length > 1) {
+        controls.append(button("Previous step", "previous", () => show(current - 1)), counter, button("Next step", "next", () => show(current + 1)));
+    }
+    return { controls, show, current: () => current };
+}
+function stepWithKeys(element, steps) {
+    element.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft")
+            steps.show(steps.current() - 1);
+        if (event.key === "ArrowRight")
+            steps.show(steps.current() + 1);
+    });
+}
+function setUpFigure(figure) {
+    if (figure.dataset.ready)
+        return;
+    figure.dataset.ready = "true";
+    figure.classList.add("markdown-d2-ready");
+    figure.tabIndex = 0;
+    const boards = Array.from(figure.querySelectorAll(":scope > .markdown-d2-board"));
+    const transition = (figure.dataset.transition ?? "none");
+    const steps = stepControls(boards, (current) => {
+        const old = figure.querySelector(":scope > .markdown-d2-current");
+        const before = old ? measure(old) : null;
+        for (const [i, board] of boards.entries()) {
+            board.classList.toggle("markdown-d2-current", i === current);
+        }
+        const now = boards[current];
+        if (before && now && old !== now)
+            play(transition, now, before);
+    });
+    if (boards.length > 1)
+        stepWithKeys(figure, steps);
+    steps.controls.append(button("Open full screen", "fullScreen", () => openDialog(boards, steps.current(), transition, steps.show)));
+    figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
+    steps.show(0);
+}
+function openDialog(boards, start, transition, onStep) {
+    const dialog = document.createElement("dialog");
+    dialog.className = "markdown-d2-dialog";
+    const stage = document.createElement("div");
+    stage.className = "markdown-d2-stage";
+    const view = document.createElement("div");
+    view.className = "markdown-d2-view";
+    stage.append(view);
+    let scale = 1;
+    let x = 0;
+    let y = 0;
+    const apply = () => {
+        view.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+    };
+    const zoom = (factor, originX, originY) => {
+        x = originX - (originX - x) * factor;
+        y = originY - (originY - y) * factor;
+        scale *= factor;
+        apply();
+    };
+    stage.addEventListener("wheel", (event) => {
+        event.preventDefault();
+        const box = stage.getBoundingClientRect();
+        zoom(event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP, event.clientX - box.left, event.clientY - box.top);
+    });
+    let dragging = null;
+    stage.addEventListener("pointerdown", (event) => {
+        dragging = { x: event.clientX - x, y: event.clientY - y };
+        stage.setPointerCapture(event.pointerId);
+    });
+    stage.addEventListener("pointermove", (event) => {
+        if (!dragging)
+            return;
+        x = event.clientX - dragging.x;
+        y = event.clientY - dragging.y;
+        apply();
+    });
+    stage.addEventListener("pointerup", () => (dragging = null));
+    const steps = stepControls(boards, (current) => {
+        const before = view.childElementCount ? measure(view) : null;
+        view.replaceChildren(...Array.from(boards[current]?.children ?? [], (child) => child.cloneNode(true)));
+        if (before)
+            play(transition, view, before);
+        onStep(current);
+    });
+    if (boards.length > 1)
+        stepWithKeys(dialog, steps);
+    steps.controls.append(button("Zoom in", "zoomIn", () => zoom(ZOOM_STEP, 0, 0)), button("Zoom out", "zoomOut", () => zoom(1 / ZOOM_STEP, 0, 0)), button("Reset zoom", { text: "1:1" }, () => {
+        scale = 1;
+        x = 0;
+        y = 0;
+        apply();
+    }), button("Close", "close", () => dialog.close()));
+    dialog.append(stage, steps.controls);
+    dialog.addEventListener("close", () => dialog.remove());
+    document.body.append(dialog);
+    steps.show(start);
+    apply();
+    dialog.showModal();
+}
+function setUpFigures() {
+    document.querySelectorAll("figure.markdown-d2").forEach(setUpFigure);
+}
+(function start() {
+    if (window.markdownD2Ready)
+        return;
+    window.markdownD2Ready = true;
+    if (window.document$)
+        window.document$.subscribe(setUpFigures);
+    else if (document.readyState === "loading")
+        document.addEventListener("DOMContentLoaded", setUpFigures);
+    else
+        setUpFigures();
+})();
+</script><figure class="markdown-d2" data-transition="fade" aria-label="A web request"><div class="markdown-d2-board" data-step="1" data-name=""><div class="markdown-d2-light"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.9.0" preserveAspectRatio="xMinYMin meet" width="365" height="829" viewBox="0 0 365 829"><svg class="d2-1689922291 d2-svg" width="365" height="829" viewBox="-99 -101 365 829"><rect x="-99" y="-101" width="365" height="829" rx="0" fill="#FFFFFF" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-1689922291 .text-bold {
+	font-family: "d2-1689922291-font-bold";
+}
+@font-face {
+	font-family: d2-1689922291-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}
+.d2-1689922291 .text-italic {
+	font-family: "d2-1689922291-font-italic";
+}
+@font-face {
+	font-family: d2-1689922291-font-italic;
+	src: url("data:application/font-woff;base64,d09GRgABAAAAAAq0AAoAAAAAEKQAARhRAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgW1SVeGNtYXAAAAFUAAAAeAAAAJgCvwKkZ2x5ZgAAAcwAAAStAAAFwFLf1mJoZWFkAAAGfAAAADYAAAA2G7Ur2mhoZWEAAAa0AAAAJAAAACQLeAi2aG10eAAABtgAAABIAAAASCCQAeZsb2NhAAAHIAAAACYAAAAmDSYL2G1heHAAAAdIAAAAIAAAACAAKgD2bmFtZQAAB2gAAAMrAAAIMgntVzNwb3N0AAAKlAAAACAAAAAg/8YAMgADAeEBkAAFAAACigJY//EASwKKAlgARAFeADIBIwAAAgsFAwMEAwkCBCAAAHcAAAADAAAAAAAAAABBREJPAAEAIP//Au7/BgAAA9gBESAAAZMAAAAAAeYClAAAACAAA3icbMw9rgFxHEDRM+8/b3wNRqO2HKWELZBJSBSisAcLkBBhCaKzGyv5SVDK7U5xkUkylHJ7DFWSwsjYxMxCbWVjaxfB16fmakvrj8czHnGPW1zjEuc4xTEO7+uvMn+S3L9CQ1NLW0epq6evMuAFAAD//wMAcfEdUXicXFRfbBN1HP/+fne7259urL32Srt1R/vrXbvuetvu1/Y6urbrurF/7dgGxcWtAzRTwD9ZMMQYJAi8GKJkJrxoTDAxGgyPPPkiCfGhkfBgQgzGNxUwmQRdFgPGXc1dGSG8/N6+n3/f7+cHTRAGwG/jy8BAC+wCF3gAqBBkGGoYxMvQSITwvBERBD58HtXOf8YWX74X/eKJKrET576Z+fPINXx5+030QfXsWXPpw9XVlzY2zBj6aQMAAAEBwMfxOrRZmJQJCpQhQpAhF2bTKJouX5jNm3dzeN3cQJ7tNZQ2a4Dtmbg947andNHj5jhCGIHqqWRCIYRc+Hb55PS5g8cThcOrJ0qTq3h9+tDc64PmYzQxt3+INrgd9S1k4s8hBuANKRFDFBvzkYiiJBOpFNVFL68oJMRxHrfo9Yo2z4PiWnQoUDGG5+NyKZZJLmcyRyTq26fJycBguNSfyLzm2Lu3r08fS4d1UfNPGfqCnohqPb3SQJfSL8a7J4y9SwlAUAXASbwOvOWCGEGeMF+f+q4d3Wq/cQqXi8Xt65ZODHJ9C91Am+AH2VaaTOQw1W01fJCzVRtejmNoylJv6f390PH4zPKAUehxNJnft+wpxgJD3p7A/Kd1zLh6SXLFceLo+NqCqs3p3bQjPyf7nNQjIbltd3v3oFQBBH0A6GN8B7y2tjx+Pg2epzxh+ir5tkLnrtmsP+bqau1yBnubna84Xq2gq0NN89MH2tsMvlXvO5AzF62sJQB0F9fAZ+FRnqc2oMfNM0SwZJMQxzPSpfJAJ9u7oOaSzbnSMMtOdk9q47i2kSX9hbQUNn9Aqnt3+0xMM68+xXyIa+CwMRkLVyARnpculY/gJ4s3T81W1/y4ZgYQumXee3jyNCBQ61vwL66By0oymTAEyljbfRrhWwXudPkMQk6G41Gr6Mg7ffiN7U/4FsaFcIZlG/uI1LfQL2gTdkHg+X143B04oltmdk7mzv4VdXpF339YnVmJxedpSrcex7Gl8XcqWuMdGV0bG50oro2N7rOw6//UKfoLbYLHah0v0GdBdWASUqymCXoONyh4XhRbL+Y5Rq5oIyWLSRkWsEv6KlxM9gz0huaJ5qa38fURKb5U2ffeMo1Ix64gFJuq0lw2pvwhB3f8UPR4h7PJMAjHkWeuvNSgDKOnDMNqQgf2uEUUDPZgebHBSSNZJyvkLl5RZmXVo3eHi0lp8PaVd5X+Bmc0mN0uI6T1/6yEYlNVPZ+FnXt4H21Cp727hksvb7tipKP5NjZQivs8XZ3+cEnKovtVNdsy1pzPmLcB1f+rb6EzaBMiL/b2xdparbVrwn05WPUNeEeUWLY3rQ2pU6o23a0JNKgMpvbkEgMLjkRUkaIa8Uckf663ryCHe6Juf1zqUVyhYTU+Jlua0/Ut9Ajdt27Y3nrq+euxPi4ruWvZFMvmylmWnQxMqOOlo/lmNnrQMWo4JQGlzDuCz7pftGj6p0njH6rfrPej39B98APw9j9k4RkMFUTRS1MWNOrAXOueDp/LJRd8rgMlpamZYZ2y66OS+asvM/kjzw+1ZHWCHpiPgmVCSiHk3P67v6wCwP8AAAD//wMA/+g0jQAAAAABAAAAARhRhjBHw18PPPUAAQPoAAAAANhdoMwAAAAA3WYvN/69/t0IHQPJAAIAAwACAAAAAAAAAAEAAAPY/u8AAAhA/r39vAgdA+gAwv/RAAAAAAAAAAAAAAASAnQAJADIAAACbgAjAiYAIwH6AAwB/gBdAeEAJQEaACsCCwAfAdwAHwD4ACwCAwAnAhf/9gIZACcBVgAfAZL//AIQADgBwP/CAAAALgAuAEgAbACsAMAA+gEiAUwBZgGIAbYB8AIqAkgChAKwAuAAAAABAAAAEgCMAAwAZgAHAAEAAAAAAAAAAAAAAAAABAADeJyclN1uGlcUhT9ioE3/Liorcm6sc5lKzuBGcZTEV+M6VkZFkDKkP1JVaYAxIGBmxAw4zhP0um/Rt8hVH6NPUfW62psNYSKrVlAUaw1n/6yz9toH2Odf9qhU7wJ/1ZeGKxzWfzZ8hy/qTcN7nNU/M1zlqPa34RqD2lvDdR7UOoY/4V31D8Of8rj6m+G7HFQvDH/Oo+q+4S/3HP8Y/orHvFvhCjzld8MVDsgM32GfXw3vcQ+rWalyj2PDNb7m0HCdQ6DLmIIpYxKGOC4ZM2TBnJickJg5Yy6JGeAI8JlS6K8JkSLH8MZfI0IK5kRacUSBY0rIlIickVV8q1kpr7Sj9Jkrkm4+BSMiepoxISLBkTIkJSFmonUKCjKe06BBTl/5ZhTkeOSMmeKRMmdIgzYXNOkyYkyO40IrCbOQlEsKroi0v7MIUaZPTEJurBYkDJSnU36xZgc0cbTJNHa7crNU4QjHj5ot3CTG8S2e/ndbzMp912wilqqnaNhjqjyvdIIjVVz6+vyguOA5bid9ykxu12ig7GTWY3osdP4yP8kTJgnOHeATqoNCdx/HmX4HhKrITwR0eUmb13T126dDB58WXQJeaG6bDo7vaNPiXDMCxauzC3VMi19wfE+gMVI7Nn1Ec/l6Q2buFu7iDLnHjEy3QGYs9xfnxztNWHYoLbkjV1f0dY8kUvZAVJE9ixiaKzJ1xUy1XHsjN/0G5gg5LXS2789lG5a2e+stvibVHXYsjJNMbsXotql6H3jmSv95RAxI6WlEn5QZDQqu9W6viFgwxXGuPn6pW1Lgb3Kkz7W6JGamDAISrTMn07+R+SY07v2S7529JbJ5M93RyeZWu3SRysnWjF6reuuz0FSOtybQsKmmliMTlsqrm4r3Jdor8Q/V/bm+bikPCbSuTLJ/4ytwzDNOOGWkXaR6wnJzJq+ERJyqAhNijZI3841q9QiPEzyecMIJz3jygZZrNs74uBKf7f4+55zR5vTW26xi25zxolTt/zv/qWyP9T6Oh5uvpztP88FHuPYbjkrvZkdfA9mgpVV7vx0tImbCxR1sa+Hu4/0HAAD//wMAcqFRQAAAAwAA//UAAP/OADIAAAAAAAAAAAAAAAAAAAAAAAAAAA==");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-1689922291 .fill-N1{fill:#0A0F25;}
+		.d2-1689922291 .fill-N2{fill:#676C7E;}
+		.d2-1689922291 .fill-N7{fill:#FFFFFF;}
+		.d2-1689922291 .fill-B1{fill:#0D32B2;}
+		.d2-1689922291 .fill-B6{fill:#F7F8FE;}
+		.d2-1689922291 .stroke-B1{stroke:#0D32B2;}
+		.d2-1689922291 .stroke-B2{stroke:#0D32B2;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.light-code{display: block}.dark-code{display: none}]]></style><g class="YnJvd3Nlcg=="><g class="shape" ><rect x="19" y="0" width="104" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="71" y="38.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">browser</text></g><g class="c2VydmVy"><g class="shape" ><rect x="25" y="187" width="91" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="70.5" y="225.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">server</text></g><g class="Y2FjaGU="><g class="shape" ><rect x="79" y="374" width="86" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="122" y="412.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">cache</text></g><g class="ZGF0YWJhc2U="><g class="shape" ><rect x="16" y="561" width="110" height="66" stroke="#0D32B2" fill="#F7F8FE" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="71" y="599.5" fill="#0A0F25" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">database</text></g><g class="KGJyb3dzZXIgLSZndDsgc2VydmVyKVswXQ=="><marker id="mk-d2-1689922291-3488378134-1" markerWidth="10" markerHeight="12" refX="7" refY="6" viewBox="0 0 10 12" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0,0 10,6 0,12" fill="#0D32B2" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 70.75 67.5 C 70.75 114.300003 70.75 138.699997 70.75 183.5" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1689922291-3488378134-1)" mask="url(#d2-1689922291-1)" /><text x="70.5" y="132" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">HTTPS</text></g><g class="KHNlcnZlciAtJmd0OyBjYWNoZSlbMF0="><path d="M 89.951637 254.259087 C 115.400002 301.299988 122 325.700012 122 370.5" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1689922291-3488378134-1)" mask="url(#d2-1689922291-1)" /><text x="118" y="316" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">look up</text></g><g class="KHNlcnZlciAtJmd0OyBkYXRhYmFzZSlbMF0="><path d="M 51.548335 254.259072 C 26.099001 301.299988 19.5 332.200012 19.5 360.25 C 19.5 388.299988 26.1 512.700012 50.596725 557.981826" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1689922291-3488378134-1)" mask="url(#d2-1689922291-1)" /><text x="20.5" y="412" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">query</text></g><g class="KGNhY2hlIC0mZ3Q7IGRhdGFiYXNlKVswXQ=="><path d="M 122 441.5 C 122 488.299988 115.400002 512.700012 90.903275 557.981826" stroke="#0D32B2" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1689922291-3488378134-1)" mask="url(#d2-1689922291-1)" /><text x="118" y="509" fill="#676C7E" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">refresh</text></g><mask id="d2-1689922291-1" maskUnits="userSpaceOnUse" x="-99" y="-101" width="365" height="829">
+<rect x="-99" y="-101" width="365" height="829" fill="white"></rect>
+<rect x="46" y="116" width="49" height="21" fill="black"></rect>
+<rect x="92" y="300" width="52" height="21" fill="black"></rect>
+<rect x="-1" y="396" width="43" height="21" fill="black"></rect>
+<rect x="93" y="493" width="50" height="21" fill="black"></rect>
+</mask></svg></svg></div><div class="markdown-d2-dark"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" data-d2-version="v0.9.0" preserveAspectRatio="xMinYMin meet" width="365" height="829" viewBox="0 0 365 829"><svg class="d2-1824143243 d2-svg" width="365" height="829" viewBox="-99 -101 365 829"><rect x="-99" y="-101" width="365" height="829" rx="0" fill="#1E1E2E" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-1824143243 .text-bold {
+	font-family: "d2-1824143243-font-bold";
+}
+@font-face {
+	font-family: d2-1824143243-font-bold;
+	src: url("data:application/font-woff;base64,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");
+}
+.d2-1824143243 .text-italic {
+	font-family: "d2-1824143243-font-italic";
+}
+@font-face {
+	font-family: d2-1824143243-font-italic;
+	src: url("data:application/font-woff;base64,d09GRgABAAAAAAq0AAoAAAAAEKQAARhRAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAAA9AAAAGAAAABgW1SVeGNtYXAAAAFUAAAAeAAAAJgCvwKkZ2x5ZgAAAcwAAAStAAAFwFLf1mJoZWFkAAAGfAAAADYAAAA2G7Ur2mhoZWEAAAa0AAAAJAAAACQLeAi2aG10eAAABtgAAABIAAAASCCQAeZsb2NhAAAHIAAAACYAAAAmDSYL2G1heHAAAAdIAAAAIAAAACAAKgD2bmFtZQAAB2gAAAMrAAAIMgntVzNwb3N0AAAKlAAAACAAAAAg/8YAMgADAeEBkAAFAAACigJY//EASwKKAlgARAFeADIBIwAAAgsFAwMEAwkCBCAAAHcAAAADAAAAAAAAAABBREJPAAEAIP//Au7/BgAAA9gBESAAAZMAAAAAAeYClAAAACAAA3icbMw9rgFxHEDRM+8/b3wNRqO2HKWELZBJSBSisAcLkBBhCaKzGyv5SVDK7U5xkUkylHJ7DFWSwsjYxMxCbWVjaxfB16fmakvrj8czHnGPW1zjEuc4xTEO7+uvMn+S3L9CQ1NLW0epq6evMuAFAAD//wMAcfEdUXicXFRfbBN1HP/+fne7259urL32Srt1R/vrXbvuetvu1/Y6urbrurF/7dgGxcWtAzRTwD9ZMMQYJAi8GKJkJrxoTDAxGgyPPPkiCfGhkfBgQgzGNxUwmQRdFgPGXc1dGSG8/N6+n3/f7+cHTRAGwG/jy8BAC+wCF3gAqBBkGGoYxMvQSITwvBERBD58HtXOf8YWX74X/eKJKrET576Z+fPINXx5+030QfXsWXPpw9XVlzY2zBj6aQMAAAEBwMfxOrRZmJQJCpQhQpAhF2bTKJouX5jNm3dzeN3cQJ7tNZQ2a4Dtmbg947andNHj5jhCGIHqqWRCIYRc+Hb55PS5g8cThcOrJ0qTq3h9+tDc64PmYzQxt3+INrgd9S1k4s8hBuANKRFDFBvzkYiiJBOpFNVFL68oJMRxHrfo9Yo2z4PiWnQoUDGG5+NyKZZJLmcyRyTq26fJycBguNSfyLzm2Lu3r08fS4d1UfNPGfqCnohqPb3SQJfSL8a7J4y9SwlAUAXASbwOvOWCGEGeMF+f+q4d3Wq/cQqXi8Xt65ZODHJ9C91Am+AH2VaaTOQw1W01fJCzVRtejmNoylJv6f390PH4zPKAUehxNJnft+wpxgJD3p7A/Kd1zLh6SXLFceLo+NqCqs3p3bQjPyf7nNQjIbltd3v3oFQBBH0A6GN8B7y2tjx+Pg2epzxh+ir5tkLnrtmsP+bqau1yBnubna84Xq2gq0NN89MH2tsMvlXvO5AzF62sJQB0F9fAZ+FRnqc2oMfNM0SwZJMQxzPSpfJAJ9u7oOaSzbnSMMtOdk9q47i2kSX9hbQUNn9Aqnt3+0xMM68+xXyIa+CwMRkLVyARnpculY/gJ4s3T81W1/y4ZgYQumXee3jyNCBQ61vwL66By0oymTAEyljbfRrhWwXudPkMQk6G41Gr6Mg7ffiN7U/4FsaFcIZlG/uI1LfQL2gTdkHg+X143B04oltmdk7mzv4VdXpF339YnVmJxedpSrcex7Gl8XcqWuMdGV0bG50oro2N7rOw6//UKfoLbYLHah0v0GdBdWASUqymCXoONyh4XhRbL+Y5Rq5oIyWLSRkWsEv6KlxM9gz0huaJ5qa38fURKb5U2ffeMo1Ix64gFJuq0lw2pvwhB3f8UPR4h7PJMAjHkWeuvNSgDKOnDMNqQgf2uEUUDPZgebHBSSNZJyvkLl5RZmXVo3eHi0lp8PaVd5X+Bmc0mN0uI6T1/6yEYlNVPZ+FnXt4H21Cp727hksvb7tipKP5NjZQivs8XZ3+cEnKovtVNdsy1pzPmLcB1f+rb6EzaBMiL/b2xdparbVrwn05WPUNeEeUWLY3rQ2pU6o23a0JNKgMpvbkEgMLjkRUkaIa8Uckf663ryCHe6Juf1zqUVyhYTU+Jlua0/Ut9Ajdt27Y3nrq+euxPi4ruWvZFMvmylmWnQxMqOOlo/lmNnrQMWo4JQGlzDuCz7pftGj6p0njH6rfrPej39B98APw9j9k4RkMFUTRS1MWNOrAXOueDp/LJRd8rgMlpamZYZ2y66OS+asvM/kjzw+1ZHWCHpiPgmVCSiHk3P67v6wCwP8AAAD//wMA/+g0jQAAAAABAAAAARhRhjBHw18PPPUAAQPoAAAAANhdoMwAAAAA3WYvN/69/t0IHQPJAAIAAwACAAAAAAAAAAEAAAPY/u8AAAhA/r39vAgdA+gAwv/RAAAAAAAAAAAAAAASAnQAJADIAAACbgAjAiYAIwH6AAwB/gBdAeEAJQEaACsCCwAfAdwAHwD4ACwCAwAnAhf/9gIZACcBVgAfAZL//AIQADgBwP/CAAAALgAuAEgAbACsAMAA+gEiAUwBZgGIAbYB8AIqAkgChAKwAuAAAAABAAAAEgCMAAwAZgAHAAEAAAAAAAAAAAAAAAAABAADeJyclN1uGlcUhT9ioE3/Liorcm6sc5lKzuBGcZTEV+M6VkZFkDKkP1JVaYAxIGBmxAw4zhP0um/Rt8hVH6NPUfW62psNYSKrVlAUaw1n/6yz9toH2Odf9qhU7wJ/1ZeGKxzWfzZ8hy/qTcN7nNU/M1zlqPa34RqD2lvDdR7UOoY/4V31D8Of8rj6m+G7HFQvDH/Oo+q+4S/3HP8Y/orHvFvhCjzld8MVDsgM32GfXw3vcQ+rWalyj2PDNb7m0HCdQ6DLmIIpYxKGOC4ZM2TBnJickJg5Yy6JGeAI8JlS6K8JkSLH8MZfI0IK5kRacUSBY0rIlIickVV8q1kpr7Sj9Jkrkm4+BSMiepoxISLBkTIkJSFmonUKCjKe06BBTl/5ZhTkeOSMmeKRMmdIgzYXNOkyYkyO40IrCbOQlEsKroi0v7MIUaZPTEJurBYkDJSnU36xZgc0cbTJNHa7crNU4QjHj5ot3CTG8S2e/ndbzMp912wilqqnaNhjqjyvdIIjVVz6+vyguOA5bid9ykxu12ig7GTWY3osdP4yP8kTJgnOHeATqoNCdx/HmX4HhKrITwR0eUmb13T126dDB58WXQJeaG6bDo7vaNPiXDMCxauzC3VMi19wfE+gMVI7Nn1Ec/l6Q2buFu7iDLnHjEy3QGYs9xfnxztNWHYoLbkjV1f0dY8kUvZAVJE9ixiaKzJ1xUy1XHsjN/0G5gg5LXS2789lG5a2e+stvibVHXYsjJNMbsXotql6H3jmSv95RAxI6WlEn5QZDQqu9W6viFgwxXGuPn6pW1Lgb3Kkz7W6JGamDAISrTMn07+R+SY07v2S7529JbJ5M93RyeZWu3SRysnWjF6reuuz0FSOtybQsKmmliMTlsqrm4r3Jdor8Q/V/bm+bikPCbSuTLJ/4ytwzDNOOGWkXaR6wnJzJq+ERJyqAhNijZI3841q9QiPEzyecMIJz3jygZZrNs74uBKf7f4+55zR5vTW26xi25zxolTt/zv/qWyP9T6Oh5uvpztP88FHuPYbjkrvZkdfA9mgpVV7vx0tImbCxR1sa+Hu4/0HAAD//wMAcqFRQAAAAwAA//UAAP/OADIAAAAAAAAAAAAAAAAAAAAAAAAAAA==");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-1824143243 .fill-N1{fill:#CDD6F4;}
+		.d2-1824143243 .fill-N2{fill:#BAC2DE;}
+		.d2-1824143243 .fill-N7{fill:#1E1E2E;}
+		.d2-1824143243 .fill-B1{fill:#CBA6f7;}
+		.d2-1824143243 .fill-B6{fill:#313244;}
+		.d2-1824143243 .stroke-B1{stroke:#CBA6f7;}
+		.d2-1824143243 .stroke-B2{stroke:#CBA6f7;}.appendix text.text{fill:#CDD6F4}.md{--color-fg-default:#CDD6F4;--color-fg-muted:#BAC2DE;--color-fg-subtle:#A6ADC8;--color-canvas-default:#1E1E2E;--color-canvas-subtle:#313244;--color-border-default:#CBA6f7;--color-border-muted:#CBA6f7;--color-neutral-muted:#313244;--color-accent-fg:#CBA6f7;--color-accent-emphasis:#CBA6f7;--color-attention-subtle:#BAC2DE;--color-danger-fg:red;}.light-code{display: none}.dark-code{display: block}]]></style><g class="YnJvd3Nlcg=="><g class="shape" ><rect x="19" y="0" width="104" height="66" stroke="#CBA6f7" fill="#313244" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="71" y="38.5" fill="#CDD6F4" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">browser</text></g><g class="c2VydmVy"><g class="shape" ><rect x="25" y="187" width="91" height="66" stroke="#CBA6f7" fill="#313244" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="70.5" y="225.5" fill="#CDD6F4" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">server</text></g><g class="Y2FjaGU="><g class="shape" ><rect x="79" y="374" width="86" height="66" stroke="#CBA6f7" fill="#313244" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="122" y="412.5" fill="#CDD6F4" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">cache</text></g><g class="ZGF0YWJhc2U="><g class="shape" ><rect x="16" y="561" width="110" height="66" stroke="#CBA6f7" fill="#313244" class=" stroke-B1 fill-B6" style="stroke-width:2;" /></g><text x="71" y="599.5" fill="#CDD6F4" class="text-bold fill-N1" style="text-anchor:middle;font-size:16px">database</text></g><g class="KGJyb3dzZXIgLSZndDsgc2VydmVyKVswXQ=="><marker id="mk-d2-1824143243-3488378134-2" markerWidth="10" markerHeight="12" refX="7" refY="6" viewBox="0 0 10 12" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0,0 10,6 0,12" fill="#CBA6f7" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 70.75 67.5 C 70.75 114.300003 70.75 138.699997 70.75 183.5" stroke="#CBA6f7" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1824143243-3488378134-2)" mask="url(#d2-1824143243-2)" /><text x="70.5" y="132" fill="#BAC2DE" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">HTTPS</text></g><g class="KHNlcnZlciAtJmd0OyBjYWNoZSlbMF0="><path d="M 89.951637 254.259087 C 115.400002 301.299988 122 325.700012 122 370.5" stroke="#CBA6f7" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1824143243-3488378134-2)" mask="url(#d2-1824143243-2)" /><text x="118" y="316" fill="#BAC2DE" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">look up</text></g><g class="KHNlcnZlciAtJmd0OyBkYXRhYmFzZSlbMF0="><path d="M 51.548335 254.259072 C 26.099001 301.299988 19.5 332.200012 19.5 360.25 C 19.5 388.299988 26.1 512.700012 50.596725 557.981826" stroke="#CBA6f7" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1824143243-3488378134-2)" mask="url(#d2-1824143243-2)" /><text x="20.5" y="412" fill="#BAC2DE" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">query</text></g><g class="KGNhY2hlIC0mZ3Q7IGRhdGFiYXNlKVswXQ=="><path d="M 122 441.5 C 122 488.299988 115.400002 512.700012 90.903275 557.981826" stroke="#CBA6f7" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-d2-1824143243-3488378134-2)" mask="url(#d2-1824143243-2)" /><text x="118" y="509" fill="#BAC2DE" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">refresh</text></g><mask id="d2-1824143243-2" maskUnits="userSpaceOnUse" x="-99" y="-101" width="365" height="829">
+<rect x="-99" y="-101" width="365" height="829" fill="white"></rect>
+<rect x="46" y="116" width="49" height="21" fill="black"></rect>
+<rect x="92" y="300" width="52" height="21" fill="black"></rect>
+<rect x="-1" y="396" width="43" height="21" fill="black"></rect>
+<rect x="93" y="493" width="50" height="21" fill="black"></rect>
+</mask></svg></svg></div></div><figcaption>A web request</figcaption></figure>
+<p>This picture comes from this block:</p>
+<div class="highlight"><pre><span></span><code><span class="sb">```d2</span><span class="w"> </span>title="A web request"
+<span class="s">browser -&gt; server: HTTPS</span>
+<span class="s">server -&gt; cache: look up</span>
+<span class="s">server -&gt; database: query</span>
+<span class="s">cache -&gt; database: refresh</span>
+<span class="sb">```</span>
+</code></pre></div>
+<p>Because the build draws every diagram, a mistake in one stops the build with a
+message naming the page, the diagram and the line, so a broken picture never
+reaches your readers.</p>
+<h2 id="where-to-go-next">Where to go next<a class="headerlink" href="#where-to-go-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li>To start, <a href="tutorials/first-diagram/">draw your first diagram</a> in a small
+  site of your own.</li>
+<li>If you have a site already, the how-to guides show how to
+  <a href="how-to/show-steps/">show a diagram one step at a time</a>,
+  <a href="how-to/import-files-and-icons/">import files and icons</a>,
+  <a href="how-to/change-the-look/">change how a diagram looks</a>,
+  <a href="how-to/fix-a-broken-diagram/">fix a broken diagram</a> and
+  <a href="how-to/use-python-markdown/">use <code>markdown-d2</code> without <code>zensical</code></a>.</li>
+<li>To look something up, the reference lists the
+  <a href="reference/settings/">settings</a>, <a href="reference/figure/">what the figure holds</a>,
+  <a href="reference/d2-features/">which D2 features work</a> and the
+  <a href="reference/api/">Python API</a>.</li>
+<li>To understand how it works, read about
+  <a href="explanation/how-it-works/">drawing diagrams when the site is built</a>.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+        
+          
+          <a href="./tutorials/first-diagram/" class="md-footer__link md-footer__link--next" aria-label="Next: Draw your first diagram">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Draw your first diagram
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="lucide lucide-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://zensical.org/" target="_blank" rel="noopener">
+      Zensical
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog" role="status" aria-atomic="true">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      
+      
+        
+        
+      <script id="__config" type="application/json">{"annotate":null,"base":".","features":["navigation.sections","navigation.footer","content.code.copy","content.tooltips","toc.follow"],"redirect":null,"search":"./assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","clipboard.error":"Could not copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+    
+    
+      <script src="./assets/javascripts/bundle.3c842f4c.min.js"></script>
+      
+    
+  </body>
+</html>
