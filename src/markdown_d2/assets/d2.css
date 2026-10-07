@@ -3,7 +3,9 @@
 .markdown-d2 .markdown-d2-dark, .markdown-d2-dialog .markdown-d2-dark { display: none; }
 DARK_SELECTOR .markdown-d2 .markdown-d2-dark, DARK_SELECTOR .markdown-d2-dialog .markdown-d2-dark { display: block; }
 DARK_SELECTOR .markdown-d2 .markdown-d2-light, DARK_SELECTOR .markdown-d2-dialog .markdown-d2-light { display: none; }
-.markdown-d2.markdown-d2-ready .markdown-d2-board:not(.markdown-d2-current) { display: none; }
+.markdown-d2.markdown-d2-ready { display: grid; grid-template-columns: minmax(0, 1fr); }
+.markdown-d2.markdown-d2-ready > .markdown-d2-board { grid-area: 1 / 1; }
+.markdown-d2.markdown-d2-ready > .markdown-d2-board:not(.markdown-d2-current) { visibility: hidden; }
 .markdown-d2 .markdown-d2-board + .markdown-d2-board { margin-top: 1em; }
 .markdown-d2.markdown-d2-ready .markdown-d2-board + .markdown-d2-board { margin-top: 0; }
 .markdown-d2-controls { display: flex; gap: 0.5em; align-items: center; justify-content: center; margin-top: 0.5em; }

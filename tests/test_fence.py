@@ -112,6 +112,10 @@ def test_render_an_empty_block(page: Callable[..., str]) -> None:
             "```d2\na: { icon: https://example.org/a.svg }\n```",
             "URL icons are not enabled",
         ),
+        (
+            '```d2 transition="spin"\na\n```',
+            'unknown transition "spin"; use none, fade or morph',
+        ),
     ],
 )
 def test_stop_the_build_on_a_broken_block(
@@ -193,3 +197,20 @@ def test_stop_when_the_cache_cannot_be_written(
 def test_keep_a_d2_message_without_a_position() -> None:
     """Report a D2 message that names the file but no line as it is."""
     assert describe(D2Error(["index.d2: odd"])) == "index.d2: odd"
+
+
+@pytest.mark.parametrize(
+    ("text", "settings", "transition"),
+    [
+        ("```d2\na\n```", {}, "fade"),
+        ("```d2\na\n```", {"transition": "none"}, "none"),
+        ('```d2 transition="morph"\na\n```', {"transition": "none"}, "morph"),
+    ],
+)
+def test_mark_the_transition_between_steps(
+    page: Callable[..., str], text: str, settings: dict[str, str], transition: str
+) -> None:
+    """Take the transition from the block, else the formatter, else fade."""
+    html = page(text, **settings)
+
+    assert f'<figure class="markdown-d2" data-transition="{transition}">' in html

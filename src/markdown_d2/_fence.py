@@ -21,7 +21,8 @@ from ._sources import SourceError, prepare
 if TYPE_CHECKING:
     from markdown import Markdown
 
-OPTIONS = {"title"}
+OPTIONS = {"title", "transition"}
+TRANSITIONS = ("none", "fade", "morph")
 D2_POSITION = re.compile(r"^index\.d2:(\d+):(\d+):(.*)$", re.DOTALL)
 VIEW_BOX = re.compile(r'^<svg (?![^>]*\bwidth=)([^>]*?)viewBox="0 0 ([\d.]+) ([\d.]+)"')
 ID = re.compile(r'\bid="([^"]+)"')
@@ -43,6 +44,8 @@ class Settings:
     """CSS selector under which the dark SVG shows."""
     errors: Literal["raise", "show"]
     """Whether a broken block stops the build or is drawn in the page."""
+    transition: str
+    """How the picture changes from one step to the next."""
 
 
 class Formatter:
@@ -111,8 +114,10 @@ class Formatter:
         title = options.get("title")
         label = f' aria-label="{html.escape(title)}"' if title else ""
         caption = f"<figcaption>{html.escape(title)}</figcaption>" if title else ""
+        transition = options.get("transition", settings.transition)
         figure = (
-            f'<figure class="markdown-d2"{label}>{"".join(parts)}{caption}</figure>'
+            f'<figure class="markdown-d2" data-transition="{transition}"{label}>'
+            f"{''.join(parts)}{caption}</figure>"
         )
         return assets_once(page, settings) + figure
 
@@ -139,6 +144,7 @@ def formatter(
     errors: Literal["raise", "show"] = "raise",
     timeout: float = 60,
     node: str | Path | None = None,
+    transition: Literal["none", "fade", "morph"] = "fade",
 ) -> Formatter:
     """Return the function that turns a d2 block into a figure.
 
@@ -160,7 +166,19 @@ def formatter(
     node
         Node program to run; by default the one `nodejs-wheel-binaries`
         installed.
+    transition
+        How a diagram with several steps changes from one to the next:
+        `"none"` switches at once, `"fade"` fades the new step in, and
+        `"morph"` moves each shape the two steps share to its new place and
+        fades in the rest. A block's own `transition` option wins.
+
+    Raises
+    ------
+    ValueError
+        If *transition* is not one of those three.
     """
+    if transition not in TRANSITIONS:
+        raise ValueError(unknown_transition(transition))
     settings = Settings(
         root=Path(root),
         cache=Cache(None if cache_dir is None else Path(cache_dir)),
@@ -168,9 +186,15 @@ def formatter(
         dark_theme=dark_theme,
         dark_selector=dark_selector,
         errors=errors,
+        transition=transition,
     )
     command = node_command(Path(node) if node else default_node())
     return Formatter(settings, command, timeout)
+
+
+def unknown_transition(name: str) -> str:
+    """Return the message for a transition that does not exist."""
+    return f'unknown transition "{name}"; use none, fade or morph'
 
 
 def block_name(source: str, options: dict[str, Any]) -> str:
@@ -218,11 +242,14 @@ def render_boards(
     Raises
     ------
     ValueError
-        If the block has an option other than `title`.
+        If the block has an option other than `title` and `transition`, or
+        an unknown transition.
     """
     unknown = sorted(set(options) - OPTIONS)
     if unknown:
         raise ValueError(f'unknown option "{unknown[0]}"; set it in d2-config instead')
+    if options.get("transition", settings.transition) not in TRANSITIONS:
+        raise ValueError(unknown_transition(options["transition"]))
     files = prepare(source, settings.root)
     name = key(files, settings.light_theme, settings.dark_theme, *versions)
     cached = settings.cache.get(f"{name}.json")

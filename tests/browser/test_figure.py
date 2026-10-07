@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Generator
 from pathlib import Path
+from typing import Literal
 
 import pytest
 from playwright.sync_api import Browser, Page, expect, sync_playwright
@@ -14,6 +15,10 @@ STEPS = (
     '```d2 title="Three steps"\nstart\nsteps: {\n  1: { middle }\n  2: { end }\n}\n```'
 )
 SCREENSHOTS = Path("test-results")
+ANIMATIONS = """() => document.getAnimations().map((animation) => {
+  const keyframes = animation.effect.getKeyframes();
+  return keyframes.some((frame) => frame.transform) ? "move" : "fade";
+})"""
 
 
 @pytest.fixture
@@ -25,13 +30,25 @@ def browser() -> Generator[Browser, None, None]:
 
 
 @pytest.fixture
-def opened(page: Callable[..., str], browser: Browser, tmp_path: Path) -> Page:
-    html = page(STEPS)
-    file = tmp_path / "index.html"
-    file.write_text(f"<!doctype html><body>{html}</body>", encoding="utf-8")
-    tab = browser.new_page()
-    tab.goto(file.as_uri())
-    return tab
+def open_page(
+    page: Callable[..., str], browser: Browser, tmp_path: Path
+) -> Callable[..., Page]:
+    def open_steps(
+        motion: Literal["reduce", "no-preference"] = "no-preference", **settings: str
+    ) -> Page:
+        html = page(STEPS, **settings)
+        file = tmp_path / "index.html"
+        file.write_text(f"<!doctype html><body>{html}</body>", encoding="utf-8")
+        tab = browser.new_page(reduced_motion=motion)
+        tab.goto(file.as_uri())
+        return tab
+
+    return open_steps
+
+
+@pytest.fixture
+def opened(open_page: Callable[..., Page]) -> Page:
+    return open_page()
 
 
 def test_step_open_full_screen_and_switch_theme(opened: Page) -> None:
@@ -70,3 +87,25 @@ def test_step_open_full_screen_and_switch_theme(opened: Page) -> None:
     expect(figure.locator(".markdown-d2-current .markdown-d2-dark")).to_be_visible()
     expect(figure.locator(".markdown-d2-current .markdown-d2-light")).to_be_hidden()
     opened.screenshot(path=SCREENSHOTS / "dark.png")
+
+
+@pytest.mark.parametrize(
+    ("transition", "motion", "kinds"),
+    [
+        ("none", "no-preference", set()),
+        ("fade", "no-preference", {"fade"}),
+        ("morph", "no-preference", {"move", "fade"}),
+        ("morph", "reduce", set()),
+    ],
+)
+def test_animate_the_change_of_step(
+    open_page: Callable[..., Page], transition: str, motion: str, kinds: set[str]
+) -> None:
+    """Fade or move shapes to the next step, and keep still when asked to."""
+    tab = open_page(motion, transition=transition)
+    figure = tab.locator("figure.markdown-d2")
+    expect(figure.locator(".markdown-d2-counter")).to_have_text("1 / 3")
+
+    figure.get_by_role("button", name="Next step").click()
+
+    assert set(tab.evaluate(ANIMATIONS)) == kinds

@@ -39,6 +39,77 @@ function button(
   return element;
 }
 
+type Transition = "none" | "fade" | "morph";
+
+const DURATION = { fade: 250, morph: 450 } as const;
+
+function visibleSvg(container: Element): SVGSVGElement | null {
+  for (const variant of container.querySelectorAll<HTMLElement>(
+    ":scope > .markdown-d2-light, :scope > .markdown-d2-dark",
+  )) {
+    if (getComputedStyle(variant).display !== "none") return variant.querySelector("svg");
+  }
+  return null;
+}
+
+function shapes(svg: SVGSVGElement): Map<string, SVGGElement> {
+  // D2 marks each shape and connection with a class holding its id, which is
+  // the same on every board of the diagram
+  const found = new Map<string, SVGGElement>();
+  for (const group of svg.querySelectorAll<SVGGElement>("g[class]:not(.shape)")) {
+    const name = group.getAttribute("class");
+    if (name && !found.has(name)) found.set(name, group);
+  }
+  return found;
+}
+
+function measure(container: Element): Map<string, DOMRect> {
+  const svg = visibleSvg(container);
+  const rects = new Map<string, DOMRect>();
+  for (const [name, group] of svg ? shapes(svg) : [])
+    rects.set(name, group.getBoundingClientRect());
+  return rects;
+}
+
+function play(transition: Transition, container: Element, before: Map<string, DOMRect>): void {
+  const svg = visibleSvg(container);
+  if (!svg || transition === "none" || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+  const fadeIn = (element: Element, duration: number): void => {
+    element.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing: "ease-out" });
+  };
+  if (transition === "fade") {
+    fadeIn(svg, DURATION.fade);
+    return;
+  }
+  // a shape moves in the units of the SVG, which may be drawn smaller than its view box
+  const units = svg.viewBox.baseVal.width / svg.getBoundingClientRect().width || 1;
+  for (const [name, group] of shapes(svg)) {
+    const old = before.get(name);
+    const now = group.getBoundingClientRect();
+    if (!old) {
+      fadeIn(group, DURATION.morph);
+      continue;
+    }
+    const x = (old.left - now.left) * units;
+    const y = (old.top - now.top) * units;
+    // a straight connection has no width or no height, which cannot scale
+    const scaleX = old.width && now.width ? old.width / now.width : 1;
+    const scaleY = old.height && now.height ? old.height / now.height : 1;
+    if (x === 0 && y === 0 && scaleX === 1 && scaleY === 1) continue;
+    group.style.transformBox = "fill-box";
+    group.style.transformOrigin = "0 0";
+    group.animate(
+      [
+        { transform: `translate(${x}px, ${y}px) scale(${scaleX}, ${scaleY})` },
+        { transform: "none" },
+      ],
+      { duration: DURATION.morph, easing: "ease-in-out" },
+    );
+  }
+}
+
 function stepControls(
   boards: HTMLElement[],
   onStep: (index: number) => void,
@@ -81,20 +152,32 @@ function setUpFigure(figure: HTMLElement): void {
   figure.classList.add("markdown-d2-ready");
   figure.tabIndex = 0;
   const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .markdown-d2-board"));
+  const transition = (figure.dataset.transition ?? "none") as Transition;
   const steps = stepControls(boards, (current) => {
+    const old = figure.querySelector(":scope > .markdown-d2-current");
+    const before = old ? measure(old) : null;
     for (const [i, board] of boards.entries()) {
       board.classList.toggle("markdown-d2-current", i === current);
     }
+    const now = boards[current];
+    if (before && now && old !== now) play(transition, now, before);
   });
   if (boards.length > 1) stepWithKeys(figure, steps);
   steps.controls.append(
-    button("Open full screen", "fullScreen", () => openDialog(boards, steps.current(), steps.show)),
+    button("Open full screen", "fullScreen", () =>
+      openDialog(boards, steps.current(), transition, steps.show),
+    ),
   );
   figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
   steps.show(0);
 }
 
-function openDialog(boards: HTMLElement[], start: number, onStep: (index: number) => void): void {
+function openDialog(
+  boards: HTMLElement[],
+  start: number,
+  transition: Transition,
+  onStep: (index: number) => void,
+): void {
   const dialog = document.createElement("dialog");
   dialog.className = "markdown-d2-dialog";
   const stage = document.createElement("div");
@@ -138,9 +221,11 @@ function openDialog(boards: HTMLElement[], start: number, onStep: (index: number
   stage.addEventListener("pointerup", () => (dragging = null));
 
   const steps = stepControls(boards, (current) => {
+    const before = view.childElementCount ? measure(view) : null;
     view.replaceChildren(
       ...Array.from(boards[current]?.children ?? [], (child) => child.cloneNode(true)),
     );
+    if (before) play(transition, view, before);
     onStep(current);
   });
   if (boards.length > 1) stepWithKeys(dialog, steps);
