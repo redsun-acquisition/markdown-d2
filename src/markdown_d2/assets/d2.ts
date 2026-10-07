@@ -14,24 +14,21 @@ function button(label: string, text: string, onClick: () => void): HTMLButtonEle
   return element;
 }
 
-function setUpFigure(figure: HTMLElement): void {
-  if (figure.dataset.ready) return;
-  figure.dataset.ready = "true";
-  figure.classList.add("markdown-d2-ready");
-  figure.tabIndex = 0;
-  const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .markdown-d2-board"));
-  let current = 0;
+function stepControls(
+  boards: HTMLElement[],
+  start: number,
+  onStep: (index: number) => void,
+): { controls: HTMLElement; show: (index: number) => void; current: () => number } {
+  let current = start;
   const counter = document.createElement("span");
   counter.className = "markdown-d2-counter";
   counter.setAttribute("aria-live", "polite");
-
   const show = (index: number): void => {
     current = (index + boards.length) % boards.length;
-    boards.forEach((board, i) => board.classList.toggle("markdown-d2-current", i === current));
     const name = boards[current].dataset.name;
     counter.textContent = `${current + 1} / ${boards.length}${name ? ` · ${name}` : ""}`;
+    onStep(current);
   };
-
   const controls = document.createElement("div");
   controls.className = "markdown-d2-controls";
   if (boards.length > 1) {
@@ -40,25 +37,39 @@ function setUpFigure(figure: HTMLElement): void {
       counter,
       button("Next step", "▶", () => show(current + 1)),
     );
-    figure.addEventListener("keydown", (event) => {
-      if (event.key === "ArrowLeft") show(current - 1);
-      if (event.key === "ArrowRight") show(current + 1);
-    });
   }
-  controls.append(button("Open full screen", "⛶", () => openDialog(boards[current])));
-  const caption = figure.querySelector("figcaption");
-  figure.insertBefore(controls, caption);
-  show(0);
+  return { controls, show, current: () => current };
 }
 
-function openDialog(board: HTMLElement): void {
+function stepWithKeys(element: HTMLElement, steps: { show: (index: number) => void; current: () => number }): void {
+  element.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") steps.show(steps.current() - 1);
+    if (event.key === "ArrowRight") steps.show(steps.current() + 1);
+  });
+}
+
+function setUpFigure(figure: HTMLElement): void {
+  if (figure.dataset.ready) return;
+  figure.dataset.ready = "true";
+  figure.classList.add("markdown-d2-ready");
+  figure.tabIndex = 0;
+  const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .markdown-d2-board"));
+  const steps = stepControls(boards, 0, (current) => {
+    boards.forEach((board, i) => board.classList.toggle("markdown-d2-current", i === current));
+  });
+  if (boards.length > 1) stepWithKeys(figure, steps);
+  steps.controls.append(button("Open full screen", "⛶", () => openDialog(boards, steps.current(), steps.show)));
+  figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
+  steps.show(0);
+}
+
+function openDialog(boards: HTMLElement[], start: number, onStep: (index: number) => void): void {
   const dialog = document.createElement("dialog");
   dialog.className = "markdown-d2-dialog";
   const stage = document.createElement("div");
   stage.className = "markdown-d2-stage";
   const view = document.createElement("div");
   view.className = "markdown-d2-view";
-  view.append(...Array.from(board.children).map((child) => child.cloneNode(true)));
   stage.append(view);
 
   let scale = 1;
@@ -91,9 +102,12 @@ function openDialog(board: HTMLElement): void {
   });
   stage.addEventListener("pointerup", () => (dragging = null));
 
-  const controls = document.createElement("div");
-  controls.className = "markdown-d2-controls";
-  controls.append(
+  const steps = stepControls(boards, start, (current) => {
+    view.replaceChildren(...Array.from(boards[current].children).map((child) => child.cloneNode(true)));
+    onStep(current);
+  });
+  if (boards.length > 1) stepWithKeys(dialog, steps);
+  steps.controls.append(
     button("Zoom in", "+", () => zoom(ZOOM_STEP, 0, 0)),
     button("Zoom out", "-", () => zoom(1 / ZOOM_STEP, 0, 0)),
     button("Reset zoom", "1:1", () => {
@@ -104,9 +118,10 @@ function openDialog(board: HTMLElement): void {
     }),
     button("Close", "✕", () => dialog.close()),
   );
-  dialog.append(stage, controls);
+  dialog.append(stage, steps.controls);
   dialog.addEventListener("close", () => dialog.remove());
   document.body.append(dialog);
+  steps.show(start);
   apply();
   dialog.showModal();
 }
