@@ -22,15 +22,20 @@ markdown-d2/
 |   |-- __init__.py          formatter, validator, __version__
 |   |-- _paths.py            where Node, the render script, D2 and the assets are
 |   |-- _renderer.py         the long-running Node process
-|   |-- render.mts           the Node side: compile, list boards, render
-|   |-- _cache.py            SVGs and board lists on disk, by key
+|   |-- render.mts           the Node side: compile, draw every board in both themes
+|   |-- _cache.py            drawn diagrams on disk, by key
 |   |-- _sources.py          icons and imports: the files D2 compiles
 |   |-- _fence.py            formatter, validator, HTML
 |   |-- assets/              d2.css, d2.ts (compiled to d2.js, ignored by git)
 |   `-- node_modules/        @d2lang/d2, copied in by the build hook (ignored by git)
 |-- tests/                   pytest; stand_ins/ holds scripts that play a failing Node
 |   `-- browser/             Playwright tests, marked browser
-|-- docs/                    the package's own Zensical site
+|-- docs/                    the package's own Zensical site, Diataxis layout
+|-- examples/                code the docs pages cut in: python_markdown.py (run by
+|                            tests/test_doc_examples.py), first-diagram/ (the
+|                            tutorial's site, built by the docs environment)
+|-- includes/                abbreviations.md, appended to every docs page
+|-- biome.json               Biome lint and format settings for the .ts and .mts files
 |-- hatch_build.py           build hook: npm ci, copy D2 into the package, compile d2.ts
 |-- package.json             pins @d2lang/d2; typescript and @types/node for development
 |-- package-lock.json
@@ -60,7 +65,7 @@ uv run tox -e browser            # Playwright tests, not in the default list
 | `types` | strict `mypy`, then `tsc` over `render.mts` and `d2.ts` |
 | `tests` | `pytest -q`, browser tests excluded |
 | `browser` | `playwright install chromium`, then the `browser` tests |
-| `docs` | `zensical build --strict` |
+| `docs` | `zensical build --strict --clean` for the site, then for `examples/first-diagram` |
 
 **Run what the change can break.** A change to `docs/` alone runs `docs`; to
 TypeScript, `types` and `tests`; anything else, the full `uv run tox`.
@@ -146,9 +151,23 @@ TypeScript, `types` and `tests`; anything else, the full `uv run tox`.
 ## Docs conventions
 
 The package's docs live in `docs/` and are built with Zensical and
-`markdown-d2` itself, so the `docs` environment is the integration test. Write
-them for someone new, in plain words, with headings that name the topic.
-Package names are code spans at every mention.
+`markdown-d2` itself, so the `docs` environment is the integration test.
+
+- Diataxis: `tutorials/`, `how-to/`, `reference/` (the API page renders the
+  docstrings with mkdocstrings), `explanation/`. Each term is defined once, in
+  `explanation/glossary.md`, and linked on its first use on a page; acronyms
+  go in `includes/abbreviations.md`.
+- Write for a reader about 15 years old who knows some Python and nothing
+  about D2: "you", short sentences, headings that name the topic, a catch in a
+  `!!! warning` box whose title names what goes wrong. Package names are code
+  spans at every mention.
+- Code on a page comes from `examples/`, cut in with snippet markers, so it is
+  code the checks run. A Python include is fenced as `{.python}`, because
+  `ruff format` would rewrite the marker inside a `python` fence.
+- A green build does not prove a page right: look at the built page, and
+  search `site/` for leftover `--8<--` markers and `][` links.
+- The README is a short front door. Settings and guides live in `docs/`, and
+  the README links to them instead of repeating them.
 
 ## Commits and branches
 
