@@ -5,11 +5,35 @@ interface Window {
 }
 
 const ZOOM_STEP = 1.25;
+const SVG = "http://www.w3.org/2000/svg";
+// strokes on a 24 by 24 grid, drawn in the text colour so they follow the theme
+const ICONS = {
+  previous: "M15 6l-6 6 6 6",
+  next: "M9 6l6 6-6 6",
+  fullScreen: "M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5",
+  zoomIn: "M12 5v14M5 12h14",
+  zoomOut: "M5 12h14",
+  close: "M6 6l12 12M18 6 6 18",
+} as const;
 
-function button(label: string, text: string, onClick: () => void): HTMLButtonElement {
+function icon(name: keyof typeof ICONS): SVGSVGElement {
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  const path = document.createElementNS(SVG, "path");
+  path.setAttribute("d", ICONS[name]);
+  svg.append(path);
+  return svg;
+}
+
+function button(
+  label: string,
+  content: keyof typeof ICONS | { text: string },
+  onClick: () => void,
+): HTMLButtonElement {
   const element = document.createElement("button");
   element.type = "button";
-  element.textContent = text;
+  element.append(typeof content === "string" ? icon(content) : content.text);
   element.setAttribute("aria-label", label);
   element.addEventListener("click", onClick);
   return element;
@@ -26,16 +50,16 @@ function stepControls(
   const show = (index: number): void => {
     current = (index + boards.length) % boards.length;
     const name = boards[current]?.dataset.name;
-    counter.textContent = `${current + 1} / ${boards.length}${name ? ` · ${name}` : ""}`;
+    counter.textContent = `${current + 1} / ${boards.length}${name ? ` (${name})` : ""}`;
     onStep(current);
   };
   const controls = document.createElement("div");
   controls.className = "markdown-d2-controls";
   if (boards.length > 1) {
     controls.append(
-      button("Previous step", "◀", () => show(current - 1)),
+      button("Previous step", "previous", () => show(current - 1)),
       counter,
-      button("Next step", "▶", () => show(current + 1)),
+      button("Next step", "next", () => show(current + 1)),
     );
   }
   return { controls, show, current: () => current };
@@ -64,7 +88,7 @@ function setUpFigure(figure: HTMLElement): void {
   });
   if (boards.length > 1) stepWithKeys(figure, steps);
   steps.controls.append(
-    button("Open full screen", "⛶", () => openDialog(boards, steps.current(), steps.show)),
+    button("Open full screen", "fullScreen", () => openDialog(boards, steps.current(), steps.show)),
   );
   figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
   steps.show(0);
@@ -121,15 +145,15 @@ function openDialog(boards: HTMLElement[], start: number, onStep: (index: number
   });
   if (boards.length > 1) stepWithKeys(dialog, steps);
   steps.controls.append(
-    button("Zoom in", "+", () => zoom(ZOOM_STEP, 0, 0)),
-    button("Zoom out", "-", () => zoom(1 / ZOOM_STEP, 0, 0)),
-    button("Reset zoom", "1:1", () => {
+    button("Zoom in", "zoomIn", () => zoom(ZOOM_STEP, 0, 0)),
+    button("Zoom out", "zoomOut", () => zoom(1 / ZOOM_STEP, 0, 0)),
+    button("Reset zoom", { text: "1:1" }, () => {
       scale = 1;
       x = 0;
       y = 0;
       apply();
     }),
-    button("Close", "✕", () => dialog.close()),
+    button("Close", "close", () => dialog.close()),
   );
   dialog.append(stage, steps.controls);
   dialog.addEventListener("close", () => dialog.remove());

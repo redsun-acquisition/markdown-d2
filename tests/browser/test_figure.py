@@ -41,10 +41,10 @@ def test_step_open_full_screen_and_switch_theme(opened: Page) -> None:
     expect(counter).to_have_text("1 / 3")
 
     figure.get_by_role("button", name="Next step").click()
-    expect(counter).to_have_text("2 / 3 · steps.1")
+    expect(counter).to_have_text("2 / 3 (steps.1)")
     figure.focus()
     opened.keyboard.press("ArrowRight")
-    expect(counter).to_have_text("3 / 3 · steps.2")
+    expect(counter).to_have_text("3 / 3 (steps.2)")
     expect(figure.locator(".markdown-d2-board.markdown-d2-current")).to_have_attribute(
         "data-name", "steps.2"
     )
@@ -57,13 +57,13 @@ def test_step_open_full_screen_and_switch_theme(opened: Page) -> None:
         "style", "transform: translate(0px, 0px) scale(1.25);"
     )
     dialog.get_by_role("button", name="Previous step").click()
-    expect(dialog.locator(".markdown-d2-counter")).to_have_text("2 / 3 · steps.1")
+    expect(dialog.locator(".markdown-d2-counter")).to_have_text("2 / 3 (steps.1)")
     expect(dialog.locator(".markdown-d2-view")).to_contain_text("middle")
     SCREENSHOTS.mkdir(exist_ok=True)
     opened.screenshot(path=SCREENSHOTS / "full-screen.png")
     opened.keyboard.press("Escape")
     expect(dialog).not_to_be_visible()
-    expect(counter).to_have_text("2 / 3 · steps.1")
+    expect(counter).to_have_text("2 / 3 (steps.1)")
 
     expect(figure.locator(".markdown-d2-current .markdown-d2-light")).to_be_visible()
     opened.evaluate("document.body.setAttribute('data-md-color-scheme', 'slate')")
