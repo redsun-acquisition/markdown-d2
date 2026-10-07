@@ -98,14 +98,25 @@ def test_raise_when_node_dies_twice() -> None:
         instance.boards({"index.d2": "a"})
 
 
-def test_raise_when_node_does_not_answer() -> None:
-    """Raise once the time limit passes without an answer."""
-    instance = Renderer(
-        [sys.executable, str(STAND_INS / "never_answers.py")], timeout=0.5
-    )
+def test_raise_when_node_does_not_answer(tmp_path: Path) -> None:
+    """Raise once the time limit passes, without starting the process again."""
+    starts = tmp_path / "starts"
+    command = [sys.executable, str(STAND_INS / "never_answers.py"), str(starts)]
+    instance = Renderer(command, timeout=0.5)
 
     with pytest.raises(RendererError, match="no answer within 0.5 s"):
         instance.boards({"index.d2": "a"})
+    instance.close()
+
+    assert starts.read_text(encoding="utf-8").splitlines() == ["started"]
+
+
+def test_skip_lines_that_are_not_the_reply() -> None:
+    """Ignore a log line and a reply to another request."""
+    instance = Renderer([sys.executable, str(STAND_INS / "chatty.py")], timeout=10)
+
+    assert instance.boards({"index.d2": "a"}) == [""]
+    assert instance.boards({"index.d2": "b"}) == [""]
     instance.close()
 
 

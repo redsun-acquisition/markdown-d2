@@ -8,8 +8,9 @@ import json
 import queue
 import subprocess
 import threading
+import time
 from collections import deque
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, Literal, NoReturn
 
 from ._paths import RENDER_SCRIPT
 
@@ -29,6 +30,10 @@ class D2Error(Exception):
 
 class RendererError(Exception):
     """The render process died or stopped answering."""
+
+
+class ProcessExited(RendererError):
+    """The render process ended, so a new one may answer."""
 
 
 def node_command(node: Path) -> list[str]:
@@ -62,7 +67,7 @@ class Renderer:
         self._process: subprocess.Popen[str] | None = None
         self._replies: queue.Queue[str | None] = queue.Queue()
         self._stderr: deque[str] = deque(maxlen=40)
-        self._error_reader = threading.Thread()
+        self._error_reader: threading.Thread | None = None
         self._next_id = 0
         atexit.register(self.close)
 
@@ -127,7 +132,7 @@ class Renderer:
         with self._lock:
             try:
                 return self._exchange(payload)
-            except RendererError:
+            except ProcessExited:
                 self.close()
                 return self._exchange(payload)
 
@@ -139,26 +144,46 @@ class Renderer:
             assert process.stdin is not None
             process.stdin.write(line + "\n")
             process.stdin.flush()
-            text = self._replies.get(timeout=self._timeout)
-        except queue.Empty:
-            process.kill()
-            self._process = None
-            raise RendererError(f"no answer within {self._timeout:g} s") from None
         except OSError:
-            text = None
-        if text is None:
-            process.wait()
-            self._error_reader.join(timeout=2)
-            output = "".join(self._stderr).strip()
-            raise RendererError(f"the render process exited: {output}")
-        reply: dict[str, Any] = json.loads(text)
+            self._exited(process)
+        deadline = time.monotonic() + self._timeout
+        while True:
+            try:
+                text = self._replies.get(timeout=max(deadline - time.monotonic(), 0))
+            except queue.Empty:
+                process.kill()
+                self._process = None
+                raise RendererError(f"no answer within {self._timeout:g} s") from None
+            if text is None:
+                self._exited(process)
+            reply = self._reply(text)
+            if reply is not None:
+                break
         if "error" in reply:
             raise D2Error(d2_messages(str(reply["error"])))
         return reply
 
+    def _reply(self, text: str) -> dict[str, Any] | None:
+        # D2 writes its own log lines to standard output, between the replies
+        try:
+            reply = json.loads(text)
+        except json.JSONDecodeError:
+            reply = None
+        if isinstance(reply, dict) and reply.get("id") == self._next_id:
+            return reply
+        self._stderr.append(text)
+        return None
+
+    def _exited(self, process: subprocess.Popen[str]) -> NoReturn:
+        process.wait()
+        if self._error_reader is not None:
+            self._error_reader.join(timeout=2)
+        output = "".join(self._stderr).strip()
+        raise ProcessExited(f"the render process exited: {output}")
+
     def _start(self) -> subprocess.Popen[str]:
         self._replies = queue.Queue()
-        self._stderr.clear()
+        self._stderr = deque(maxlen=40)
         try:
             process = subprocess.Popen(
                 self._command,
@@ -174,7 +199,7 @@ class Renderer:
             target=self._read_replies, args=(process, self._replies), daemon=True
         ).start()
         self._error_reader = threading.Thread(
-            target=self._read_errors, args=(process,), daemon=True
+            target=self._read_errors, args=(process, self._stderr), daemon=True
         )
         self._error_reader.start()
         self._process = process
@@ -183,14 +208,14 @@ class Renderer:
     def _read_replies(
         self, process: subprocess.Popen[str], replies: queue.Queue[str | None]
     ) -> None:
-        # its own process's queue, so the end of a killed process can't reach the
-        # queue of the one that replaced it
+        # its own process's queue and buffer, so the end of a killed process
+        # can't reach those of the one that replaced it
         assert process.stdout is not None
         for line in process.stdout:
             replies.put(line)
         replies.put(None)
 
-    def _read_errors(self, process: subprocess.Popen[str]) -> None:
+    def _read_errors(self, process: subprocess.Popen[str], lines: deque[str]) -> None:
         assert process.stderr is not None
         for line in process.stderr:
-            self._stderr.append(line)
+            lines.append(line)
