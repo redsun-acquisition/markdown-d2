@@ -154,15 +154,17 @@ def formatter(
         Folder that imports and icon paths are relative to.
     cache_dir
         Folder that keeps rendered SVGs between builds; `None` keeps nothing.
-    light_theme, dark_theme
-        D2 theme IDs; a diagram's own `theme-id` and `dark-theme-id` win.
+    light_theme
+        D2 theme ID of the light picture; a diagram's own `theme-id` wins.
+    dark_theme
+        D2 theme ID of the dark picture; a diagram's own `dark-theme-id` wins.
     dark_selector
         CSS selector of the page element that marks the dark theme.
     errors
         `"raise"` stops the build on a broken block; `"show"` draws the error
         in place of the diagram.
     timeout
-        Seconds to wait for one SVG.
+        Seconds to wait for one diagram, every board in both themes.
     node
         Node program to run; by default the one `nodejs-wheel-binaries`
         installed.
