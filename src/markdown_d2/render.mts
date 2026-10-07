@@ -62,7 +62,7 @@ async function render(request: RenderRequest): Promise<string> {
   const { diagram, renderOptions } = await compile(request.files);
   const options: RenderOptions = { ...renderOptions, noXMLTag: true, salt: request.salt };
   // theme 0 is also D2's value when the source sets none, so the setting wins over it
-  const light = renderOptions.themeID ? renderOptions.themeID : request.light_theme;
+  const light = renderOptions.themeID || request.light_theme;
   const dark = renderOptions.darkThemeID ?? request.dark_theme;
   options.themeID = request.variant === "dark" ? dark : light;
   delete options.darkThemeID;

@@ -17,10 +17,9 @@ function button(label: string, text: string, onClick: () => void): HTMLButtonEle
 
 function stepControls(
   boards: HTMLElement[],
-  start: number,
   onStep: (index: number) => void,
 ): { controls: HTMLElement; show: (index: number) => void; current: () => number } {
-  let current = start;
+  let current = 0;
   const counter = document.createElement("span");
   counter.className = "markdown-d2-counter";
   counter.setAttribute("aria-live", "polite");
@@ -58,7 +57,7 @@ function setUpFigure(figure: HTMLElement): void {
   figure.classList.add("markdown-d2-ready");
   figure.tabIndex = 0;
   const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .markdown-d2-board"));
-  const steps = stepControls(boards, 0, (current) => {
+  const steps = stepControls(boards, (current) => {
     for (const [i, board] of boards.entries()) {
       board.classList.toggle("markdown-d2-current", i === current);
     }
@@ -114,7 +113,7 @@ function openDialog(boards: HTMLElement[], start: number, onStep: (index: number
   });
   stage.addEventListener("pointerup", () => (dragging = null));
 
-  const steps = stepControls(boards, start, (current) => {
+  const steps = stepControls(boards, (current) => {
     view.replaceChildren(
       ...Array.from(boards[current]?.children ?? [], (child) => child.cloneNode(true)),
     );
