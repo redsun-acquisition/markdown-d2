@@ -10,7 +10,7 @@ import subprocess
 import threading
 import time
 from collections import deque
-from typing import TYPE_CHECKING, Any, Literal, NoReturn
+from typing import TYPE_CHECKING, Any, NamedTuple, NoReturn
 
 from ._paths import RENDER_SCRIPT
 
@@ -26,6 +26,17 @@ class D2Error(Exception):
         super().__init__("; ".join(messages))
         self.messages = messages
         """Each problem D2 reported, such as `index.d2:4:3: unknown shape`."""
+
+
+class Board(NamedTuple):
+    """One board of a diagram, drawn in both themes."""
+
+    name: str
+    """Path of the board, such as `steps.1`; the top board is `""`."""
+    light: str
+    """SVG in the light theme."""
+    dark: str
+    """SVG in the dark theme."""
 
 
 class RendererError(Exception):
@@ -71,29 +82,16 @@ class Renderer:
         self._next_id = 0
         atexit.register(self.close)
 
-    def boards(self, files: Mapping[str, str]) -> list[str]:
-        """Return the path of every board of the diagram, the top board as `""`.
+    def draw(
+        self, files: Mapping[str, str], light_theme: int, dark_theme: int, salt: str
+    ) -> list[Board]:
+        """Return every board of the diagram drawn in both themes, the top one first.
 
-        Raises
-        ------
-        D2Error
-            If D2 cannot compile the diagram.
-        RendererError
-            If the process dies twice or does not answer in time.
-        """
-        reply = self._request({"op": "boards", "files": dict(files)})
-        return [str(path) for path in reply["boards"]]
-
-    def render(
-        self,
-        files: Mapping[str, str],
-        board: str,
-        variant: Literal["light", "dark"],
-        light_theme: int,
-        dark_theme: int,
-        salt: str,
-    ) -> str:
-        """Return the SVG of one board in one theme.
+        Parameters
+        ----------
+        salt
+            Text that makes the CSS class names and ids of these SVGs differ
+            from those of other diagrams on the same page.
 
         Raises
         ------
@@ -104,16 +102,16 @@ class Renderer:
         """
         reply = self._request(
             {
-                "op": "render",
                 "files": dict(files),
-                "board": board,
-                "variant": variant,
                 "light_theme": light_theme,
                 "dark_theme": dark_theme,
                 "salt": salt,
             }
         )
-        return str(reply["svg"])
+        return [
+            Board(str(board["name"]), str(board["light"]), str(board["dark"]))
+            for board in reply["boards"]
+        ]
 
     def close(self) -> None:
         """Stop the process; it ends by itself once its input closes."""

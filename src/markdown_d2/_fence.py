@@ -15,13 +15,12 @@ from pymdownx.superfences import SuperFencesException
 
 from ._cache import Cache, key
 from ._paths import ASSETS, VERSION, d2_version, default_node
-from ._renderer import D2Error, Renderer, RendererError, node_command
+from ._renderer import Board, D2Error, Renderer, RendererError, node_command
 from ._sources import SourceError, prepare
 
 if TYPE_CHECKING:
     from markdown import Markdown
 
-VARIANTS: tuple[Literal["light"], Literal["dark"]] = ("light", "dark")
 OPTIONS = {"title"}
 D2_POSITION = re.compile(r"^index\.d2:(\d+):(\d+):(.*)$", re.DOTALL)
 VIEW_BOX = re.compile(r'^<svg (?![^>]*\bwidth=)([^>]*?)viewBox="0 0 ([\d.]+) ([\d.]+)"')
@@ -102,13 +101,12 @@ class Formatter:
                 )
             raise SuperFencesException(message) from error
         parts = []
-        for step, (board, svgs) in enumerate(boards, start=1):
-            light, dark = (unique_ids(svgs[variant], md) for variant in VARIANTS)
+        for step, board in enumerate(boards, start=1):
             parts.append(
                 f'<div class="markdown-d2-board" data-step="{step}" '
-                f'data-name="{html.escape(board)}">'
-                f'<div class="markdown-d2-light">{light}</div>'
-                f'<div class="markdown-d2-dark">{dark}</div></div>'
+                f'data-name="{html.escape(board.name)}">'
+                f'<div class="markdown-d2-light">{unique_ids(board.light, md)}</div>'
+                f'<div class="markdown-d2-dark">{unique_ids(board.dark, md)}</div></div>'
             )
         title = options.get("title")
         label = f' aria-label="{html.escape(title)}"' if title else ""
@@ -214,8 +212,8 @@ def render_boards(
     settings: Settings,
     renderer: Renderer,
     versions: tuple[str, str],
-) -> list[tuple[str, dict[str, str]]]:
-    """Return each board of one block with its light and dark SVG.
+) -> list[Board]:
+    """Return each board of one block, its SVGs sized to their view box.
 
     Raises
     ------
@@ -226,35 +224,18 @@ def render_boards(
     if unknown:
         raise ValueError(f'unknown option "{unknown[0]}"; set it in d2-config instead')
     files = prepare(source, settings.root)
-    source_key = key(files, *versions)
-    listed = settings.cache.get(f"{source_key}.boards.json")
-    if listed is None:
-        boards = renderer.boards(files)
-        settings.cache.put(f"{source_key}.boards.json", json.dumps(boards))
+    name = key(files, settings.light_theme, settings.dark_theme, *versions)
+    cached = settings.cache.get(f"{name}.json")
+    if cached is None:
+        boards = renderer.draw(
+            files, settings.light_theme, settings.dark_theme, name[:12]
+        )
+        settings.cache.put(f"{name}.json", json.dumps(boards))
     else:
-        boards = json.loads(listed)
-    rendered = []
-    for board in boards:
-        svgs: dict[str, str] = {}
-        for variant in VARIANTS:
-            # the renderer picks the theme of the variant itself; the key only
-            # needs the one that applies
-            theme = settings.light_theme if variant == "light" else settings.dark_theme
-            name = key(source_key, board, variant, theme)
-            svg = settings.cache.get(f"{name}.svg")
-            if svg is None:
-                svg = renderer.render(
-                    files,
-                    board,
-                    variant,
-                    settings.light_theme,
-                    settings.dark_theme,
-                    name[:12],
-                )
-                settings.cache.put(f"{name}.svg", svg)
-            svgs[variant] = sized(svg)
-        rendered.append((board, svgs))
-    return rendered
+        boards = [Board(*board) for board in json.loads(cached)]
+    return [
+        Board(board.name, sized(board.light), sized(board.dark)) for board in boards
+    ]
 
 
 def sized(svg: str) -> str:

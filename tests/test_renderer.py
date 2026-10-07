@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from markdown_d2._paths import default_node
-from markdown_d2._renderer import D2Error, Renderer, RendererError, node_command
+from markdown_d2._renderer import Board, D2Error, Renderer, RendererError, node_command
 from markdown_d2._sources import prepare
 
 STAND_INS = Path(__file__).parent / "stand_ins"
@@ -24,25 +24,31 @@ def renderer() -> Generator[Renderer, None, None]:
     instance.close()
 
 
-def test_list_and_render_boards(renderer: Renderer) -> None:
-    """List a diagram's boards and render the top board and a step."""
-    files = {"index.d2": STEPS}
+def test_draw_every_board_in_both_themes(renderer: Renderer) -> None:
+    """Draw the top board and each step, light and dark, in one request."""
+    boards = renderer.draw({"index.d2": STEPS}, 0, 200, "s")
 
-    boards = renderer.boards(files)
-    top = renderer.render(files, "", "light", 0, 200, "s1")
-    second = renderer.render(files, "steps.2", "dark", 0, 200, "s2")
+    assert [board.name for board in boards] == ["", "steps.1", "steps.2"]
+    assert "alpha_top" in boards[0].light and "beta_first" not in boards[0].light
+    assert "gamma_second" in boards[2].dark
+    assert "#1E1E2E" in boards[2].dark and "#1E1E2E" not in boards[2].light
+    assert "prefers-color-scheme" not in boards[2].dark
 
-    assert boards == ["", "steps.1", "steps.2"]
-    assert "alpha_top" in top and "beta_first" not in top
-    assert "gamma_second" in second
-    assert "#1E1E2E" in second
-    assert "prefers-color-scheme" not in second
+
+def test_draw_a_board_whose_name_has_a_dot(renderer: Renderer) -> None:
+    """Quote a board name that D2 would otherwise split at its dot."""
+    boards = renderer.draw(
+        {"index.d2": 'a\nlayers: { "v1.2": { inner } }\n'}, 0, 200, "s"
+    )
+
+    assert boards[1] == Board('layers."v1.2"', boards[1].light, boards[1].dark)
+    assert "inner" in boards[1].light
 
 
 def test_keep_text_that_is_not_ascii(renderer: Renderer) -> None:
     """Carry a label with non-ASCII text through the pipe unchanged."""
     source = "s: stage (µm)\na: Ångström\ns -> a\n"
-    svg = renderer.render({"index.d2": source}, "", "light", 0, 200, "s")
+    svg = renderer.draw({"index.d2": source}, 0, 200, "s")[0].light
 
     assert "stage (µm)" in svg
     assert "Ångström" in svg
@@ -53,9 +59,7 @@ def test_answer_two_threads_with_their_own_svgs(renderer: Renderer) -> None:
     results: dict[str, str] = {}
 
     def work(label: str) -> None:
-        results[label] = renderer.render(
-            {"index.d2": label}, "", "light", 0, 200, label
-        )
+        results[label] = renderer.draw({"index.d2": label}, 0, 200, label)[0].light
 
     labels = ("alpha_label", "beta_label")
     threads = [threading.Thread(target=work, args=(label,)) for label in labels]
@@ -73,7 +77,7 @@ def test_answer_two_threads_with_their_own_svgs(renderer: Renderer) -> None:
 def test_report_each_d2_error(renderer: Renderer) -> None:
     """Raise every compile error D2 reports, with its position."""
     with pytest.raises(D2Error) as caught:
-        renderer.boards({"index.d2": "a -> \n b: {"})
+        renderer.draw({"index.d2": "a -> \n b: {"}, 0, 200, "s")
 
     assert caught.value.messages == [
         "index.d2:1:1: connection missing destination",
@@ -86,7 +90,9 @@ def test_restart_node_once_after_a_crash(tmp_path: Path) -> None:
     command = [sys.executable, str(STAND_INS / "dies_once.py"), str(tmp_path / "flag")]
     instance = Renderer(command, timeout=10)
 
-    assert instance.boards({"index.d2": "a"}) == [""]
+    assert instance.draw({"index.d2": "a"}, 0, 200, "s") == [
+        Board("", "<svg/>", "<svg/>")
+    ]
     instance.close()
 
 
@@ -95,7 +101,7 @@ def test_raise_when_node_dies_twice() -> None:
     instance = Renderer([sys.executable, str(STAND_INS / "always_dies.py")], timeout=10)
 
     with pytest.raises(RendererError, match="render process exploded"):
-        instance.boards({"index.d2": "a"})
+        instance.draw({"index.d2": "a"}, 0, 200, "s")
 
 
 def test_raise_when_node_does_not_answer(tmp_path: Path) -> None:
@@ -105,7 +111,7 @@ def test_raise_when_node_does_not_answer(tmp_path: Path) -> None:
     instance = Renderer(command, timeout=0.5)
 
     with pytest.raises(RendererError, match="no answer within 0.5 s"):
-        instance.boards({"index.d2": "a"})
+        instance.draw({"index.d2": "a"}, 0, 200, "s")
     instance.close()
 
     assert starts.read_text(encoding="utf-8").splitlines() == ["started"]
@@ -115,25 +121,24 @@ def test_skip_lines_that_are_not_the_reply() -> None:
     """Ignore a log line and a reply to another request."""
     instance = Renderer([sys.executable, str(STAND_INS / "chatty.py")], timeout=10)
 
-    assert instance.boards({"index.d2": "a"}) == [""]
-    assert instance.boards({"index.d2": "b"}) == [""]
+    assert instance.draw({"index.d2": "a"}, 0, 200, "s")[0].name == ""
+    assert instance.draw({"index.d2": "b"}, 0, 200, "s")[0].name == ""
     instance.close()
 
 
 def test_render_an_import_with_an_embedded_icon(
     renderer: Renderer, tmp_path: Path
 ) -> None:
-    """Render an imported file that carries an icon and imports its neighbour."""
-    (tmp_path / "parts").mkdir()
-    (tmp_path / "parts" / "stage.d2").write_text(
+    """Render quoted and nested imports, and an icon inside an imported file."""
+    (tmp_path / "my parts").mkdir()
+    (tmp_path / "my parts" / "stage.d2").write_text(
         "motor: { icon: cam.svg }\nhome: @home\n", encoding="utf-8"
     )
-    (tmp_path / "parts" / "home.d2").write_text("origin_shape\n", encoding="utf-8")
+    (tmp_path / "my parts" / "home.d2").write_text("origin_shape\n", encoding="utf-8")
     (tmp_path / "cam.svg").write_bytes(b'<svg xmlns="http://www.w3.org/2000/svg"/>')
 
-    svg = renderer.render(
-        prepare("stage: @parts/stage\n", tmp_path), "", "light", 0, 200, "s"
-    )
+    files = prepare('stage: @"my parts/stage"\n', tmp_path)
+    svg = renderer.draw(files, 0, 200, "s")[0].light
 
     assert "motor" in svg and "origin_shape" in svg
     assert "data:image/svg+xml;base64," in svg

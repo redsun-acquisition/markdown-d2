@@ -8,5 +8,16 @@ import sys
 for line in sys.stdin:
     request = json.loads(line)
     print("D2 says hello", flush=True)
-    print(json.dumps({"id": -1, "boards": ["stale"]}), flush=True)
-    print(json.dumps({"id": request["id"], "boards": [""]}), flush=True)
+    print(
+        json.dumps({"id": -1, "boards": [{"name": "stale", "light": "", "dark": ""}]}),
+        flush=True,
+    )
+    print(
+        json.dumps(
+            {
+                "id": request["id"],
+                "boards": [{"name": "", "light": "<svg/>", "dark": "<svg/>"}],
+            }
+        ),
+        flush=True,
+    )

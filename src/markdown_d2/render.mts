@@ -1,32 +1,22 @@
 import { createInterface } from "node:readline";
-import type { CompileResponse, RenderOptions } from "@d2lang/d2";
+import type { RenderOptions } from "@d2lang/d2";
 import { D2 } from "@d2lang/d2";
 
-type Files = Record<string, string>;
-
-interface BoardsRequest {
+interface Request {
   id: number;
-  op: "boards";
-  files: Files;
-}
-
-interface RenderRequest {
-  id: number;
-  op: "render";
-  files: Files;
-  board: string;
-  variant: "light" | "dark";
+  files: Record<string, string>;
   light_theme: number;
   dark_theme: number;
   salt: string;
 }
 
-type Request = BoardsRequest | RenderRequest;
+interface DrawnBoard {
+  name: string;
+  light: string;
+  dark: string;
+}
 
-type Reply =
-  | { id: number; boards: string[] }
-  | { id: number; svg: string }
-  | { id: number; error: string };
+type Reply = { id: number; boards: DrawnBoard[] } | { id: number; error: string };
 
 interface Board {
   name: string;
@@ -36,49 +26,50 @@ interface Board {
 }
 
 const KINDS = ["layers", "scenarios", "steps"] as const;
+const PLAIN_NAME = /^[\w-]+$/;
 const d2 = new D2();
-let last: { key: string; compiled: CompileResponse } | null = null;
-
-async function compile(files: Files): Promise<CompileResponse> {
-  const key = JSON.stringify(files);
-  if (last?.key !== key) {
-    last = { key, compiled: await d2.compile({ fs: files, inputPath: "index.d2" }) };
-  }
-  return last.compiled;
-}
 
 function boardPaths(board: Board, prefix: string): string[] {
   const paths: string[] = [];
   for (const kind of KINDS) {
     for (const child of board[kind] ?? []) {
-      const path = `${prefix}${kind}.${child.name}`;
+      // a name with a dot or a space is quoted, or D2 would split the path at it
+      const name = PLAIN_NAME.test(child.name) ? child.name : JSON.stringify(child.name);
+      const path = `${prefix}${kind}.${name}`;
       paths.push(path, ...boardPaths(child, `${path}.`));
     }
   }
   return paths;
 }
 
-async function render(request: RenderRequest): Promise<string> {
-  const { diagram, renderOptions } = await compile(request.files);
-  const options: RenderOptions = { ...renderOptions, noXMLTag: true, salt: request.salt };
+async function draw(request: Request): Promise<DrawnBoard[]> {
+  const { diagram, renderOptions } = await d2.compile({ fs: request.files, inputPath: "index.d2" });
+  const { darkThemeID, ...options } = renderOptions;
   // theme 0 is also D2's value when the source sets none, so the setting wins over it
-  const light = renderOptions.themeID || request.light_theme;
-  const dark = renderOptions.darkThemeID ?? request.dark_theme;
-  options.themeID = request.variant === "dark" ? dark : light;
-  delete options.darkThemeID;
-  if (request.board) {
-    return d2.render(diagram, { ...options, target: request.board });
+  const light = options.themeID || request.light_theme;
+  const dark = darkThemeID ?? request.dark_theme;
+  const top = { ...diagram, layers: [], scenarios: [], steps: [] };
+  const boards: DrawnBoard[] = [];
+  for (const [index, name] of ["", ...boardPaths(diagram as Board, "")].entries()) {
+    // each SVG gets its own salt, so the class names its CSS selects differ
+    // between boards and themes on one page
+    const svg = (themeID: number, variant: string): Promise<string> => {
+      const settings: RenderOptions = {
+        ...options,
+        noXMLTag: true,
+        themeID,
+        salt: `${request.salt}-${index}${variant}`,
+      };
+      return name ? d2.render(diagram, { ...settings, target: name }) : d2.render(top, settings);
+    };
+    boards.push({ name, light: await svg(light, "l"), dark: await svg(dark, "d") });
   }
-  return d2.render({ ...diagram, layers: [], scenarios: [], steps: [] }, options);
+  return boards;
 }
 
 async function answer(request: Request): Promise<Reply> {
   try {
-    if (request.op === "boards") {
-      const { diagram } = await compile(request.files);
-      return { id: request.id, boards: ["", ...boardPaths(diagram as Board, "")] };
-    }
-    return { id: request.id, svg: await render(request) };
+    return { id: request.id, boards: await draw(request) };
   } catch (error) {
     return { id: request.id, error: error instanceof Error ? error.message : String(error) };
   }
