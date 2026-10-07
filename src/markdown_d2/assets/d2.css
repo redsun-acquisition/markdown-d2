@@ -1,5 +1,5 @@
 .d2 { margin: 1em 0; }
-.d2 svg, .d2-dialog svg { display: block; max-width: 100%; height: auto; }
+.d2-light > svg, .d2-dark > svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
 .d2 .d2-dark, .d2-dialog .d2-dark { display: none; }
 DARK_SELECTOR .d2 .d2-dark, DARK_SELECTOR .d2-dialog .d2-dark { display: block; }
 DARK_SELECTOR .d2 .d2-light, DARK_SELECTOR .d2-dialog .d2-light { display: none; }

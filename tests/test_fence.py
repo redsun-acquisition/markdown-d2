@@ -3,11 +3,17 @@
 from __future__ import annotations
 
 import base64
+import pickle
+import re
 from collections.abc import Callable
 from pathlib import Path
 
+import markdown
 import pytest
 from pymdownx.superfences import SuperFencesException
+
+from markdown_d2 import formatter
+from markdown_d2._paths import VERSION, d2_version
 
 ICON = b'<svg xmlns="http://www.w3.org/2000/svg"/>'
 PAGE = """
@@ -118,3 +124,37 @@ def test_stop_when_node_is_missing(page: Callable[..., str], files: Path) -> Non
     """Raise, naming the diagram, when the Node program does not exist."""
     with pytest.raises(SuperFencesException, match='diagram starting "a"'):
         page("```d2\na\n```", node=files / "no-such-node")
+
+
+def test_survive_pickling(tmp_path: Path) -> None:
+    """Pickle the formatter, as Zensical does with its settings, and still render."""
+    copy = pickle.loads(pickle.dumps(formatter(root=tmp_path, cache_dir=None)))
+
+    html = markdown.Markdown(
+        extensions=["pymdownx.superfences"],
+        extension_configs={
+            "pymdownx.superfences": {
+                "custom_fences": [{"name": "d2", "class": "d2", "format": copy}]
+            }
+        },
+    ).convert("```d2\na -> b\n```")
+
+    assert html.count('<figure class="d2"') == 1
+
+
+def test_give_each_picture_its_natural_size(page: Callable[..., str]) -> None:
+    """Size each SVG from its view box, so a theme that shrinks figures can't."""
+    html = page("```d2\na -> b\n```")
+
+    sizes = re.findall(
+        r'<div class="d2-light"><svg [^>]*?width="(\d+)" height="(\d+)"', html
+    )
+    assert sizes and all(int(width) > 0 and int(height) > 0 for width, height in sizes)
+
+
+def test_carry_the_versions_in_the_pickle() -> None:
+    """Put both versions in the pickle, so Zensical re-renders after an upgrade."""
+    pickled = pickle.dumps(formatter(cache_dir=None))
+
+    assert d2_version().encode() in pickled
+    assert VERSION.encode() in pickled

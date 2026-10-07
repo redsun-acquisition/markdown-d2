@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal
 
 from pymdownx.superfences import SuperFencesException
 
@@ -21,20 +22,7 @@ if TYPE_CHECKING:
 VARIANTS: tuple[Literal["light"], Literal["dark"]] = ("light", "dark")
 OPTIONS = {"title"}
 D2_POSITION = "index.d2:"
-
-
-class Formatter(Protocol):
-    """What `pymdownx.superfences` calls for each block."""
-
-    def __call__(
-        self,
-        source: str,
-        language: str,
-        class_name: str,
-        options: dict[str, Any],
-        md: Markdown,
-        **kwargs: Any,
-    ) -> str: ...
+VIEW_BOX = re.compile(r'^<svg (?![^>]*\bwidth=)([^>]*?)viewBox="0 0 ([\d.]+) ([\d.]+)"')
 
 
 @dataclass(frozen=True)
@@ -53,6 +41,59 @@ class Settings:
     """CSS selector under which the dark SVG shows."""
     errors: Literal["raise", "show"]
     """Whether a broken block stops the build or is drawn in the page."""
+
+
+class Formatter:
+    """What `pymdownx.superfences` calls for each d2 block.
+
+    It can be pickled, as Zensical does with its settings; the copy starts its
+    own render process when it first needs one. The pickle carries the package
+    and D2 versions, so a tool that caches pages by the pickled settings
+    renders them again after an upgrade.
+    """
+
+    def __init__(self, settings: Settings, command: list[str], timeout: float) -> None:
+        self._settings = settings
+        self._command = command
+        self._timeout = timeout
+        self._versions = (VERSION, d2_version())
+        self._renderer: Renderer | None = None
+
+    def __getstate__(self) -> dict[str, Any]:
+        """Return the settings, leaving out the render process."""
+        return {**self.__dict__, "_renderer": None}
+
+    def __call__(
+        self,
+        source: str,
+        language: str,
+        class_name: str,
+        options: dict[str, Any],
+        md: Markdown,
+        **kwargs: Any,
+    ) -> str:
+        """Return the figure of one block, or its error when errors are shown.
+
+        Raises
+        ------
+        SuperFencesException
+            If the block cannot be drawn and errors are raised.
+        """
+        if self._renderer is None:
+            self._renderer = Renderer(self._command, self._timeout)
+        settings = self._settings
+        name = block_name(source, options)
+        page = page_path(md)
+        try:
+            figure = render_figure(source, options, settings, self._renderer)
+        except (D2Error, SourceError, RendererError, ValueError) as error:
+            message = (
+                f"markdown-d2: {page + ': ' if page else ''}{name}: {describe(error)}"
+            )
+            if settings.errors == "show":
+                return f'<div class="d2-error" role="alert"><pre>{html.escape(message)}</pre></div>'
+            raise SuperFencesException(message) from error
+        return assets_once(md, settings) + figure
 
 
 def validator(
@@ -107,30 +148,8 @@ def formatter(
         dark_selector=dark_selector,
         errors=errors,
     )
-    renderer = Renderer(node_command(Path(node) if node else default_node()), timeout)
-
-    def format_block(
-        source: str,
-        language: str,
-        class_name: str,
-        options: dict[str, Any],
-        md: Markdown,
-        **kwargs: Any,
-    ) -> str:
-        name = block_name(source, options)
-        page = page_path(md)
-        try:
-            figure = render_figure(source, options, settings, renderer)
-        except (D2Error, SourceError, RendererError, ValueError) as error:
-            message = (
-                f"markdown-d2: {page + ': ' if page else ''}{name}: {describe(error)}"
-            )
-            if settings.errors == "show":
-                return f'<div class="d2-error" role="alert"><pre>{html.escape(message)}</pre></div>'
-            raise SuperFencesException(message) from error
-        return assets_once(md, settings) + figure
-
-    return format_block
+    command = node_command(Path(node) if node else default_node())
+    return Formatter(settings, command, timeout)
 
 
 def block_name(source: str, options: dict[str, Any]) -> str:
@@ -205,7 +224,7 @@ def render_figure(
                     name[:12],
                 )
                 settings.cache.put(f"{name}.svg", svg)
-            svgs[variant] = svg
+            svgs[variant] = sized(svg)
         parts.append(
             f'<div class="d2-board" data-step="{step}" data-name="{html.escape(board)}">'
             f'<div class="d2-light">{svgs["light"]}</div>'
@@ -215,6 +234,23 @@ def render_figure(
     label = f' aria-label="{html.escape(title)}"' if title else ""
     caption = f"<figcaption>{html.escape(title)}</figcaption>" if title else ""
     return f'<figure class="d2"{label}>{"".join(parts)}{caption}</figure>'
+
+
+def sized(svg: str) -> str:
+    """Return *svg* with a width and height taken from its view box.
+
+    D2 sizes its outer SVG by the view box alone, which collapses inside a
+    figure that a theme shrinks to fit its content.
+    """
+
+    def add_size(match: re.Match[str]) -> str:
+        attributes, width, height = match.groups()
+        return (
+            f'<svg {attributes}width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}"'
+        )
+
+    return VIEW_BOX.sub(add_size, svg, count=1)
 
 
 def assets_once(md: Markdown, settings: Settings) -> str:
