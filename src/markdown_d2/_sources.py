@@ -36,7 +36,7 @@ def inside(reference: str, root: Path) -> Path:
     """
     path = (root / reference).resolve()
     if not path.is_relative_to(root.resolve()):
-        raise SourceError(f"{reference!r} is outside `root`")
+        raise SourceError(f"{reference!r} is outside root")
     return path
 
 
@@ -51,7 +51,7 @@ def resolve_icon(reference: str, root: Path) -> bytes:
     """
     if "://" in reference:
         raise SourceError(
-            f"icons must be files under `root`; URL icons are not enabled: {reference}"
+            f"icons must be files under root; URL icons are not enabled: {reference}"
         )
     path = inside(reference, root)
     if path.suffix.lower() not in TYPES:

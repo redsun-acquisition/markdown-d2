@@ -84,5 +84,5 @@ def test_refuse_files_outside_root(tmp_path: Path, source: str) -> None:
     (tmp_path / "outside.d2").write_text("secret\n", encoding="utf-8")
     text = source.replace("{outside}", (tmp_path / "outside.svg").as_posix())
 
-    with pytest.raises(SourceError, match="outside `root`"):
+    with pytest.raises(SourceError, match="outside root"):
         prepare(text, site)
