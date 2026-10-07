@@ -11,6 +11,7 @@ import pytest
 
 from markdown_d2._paths import default_node
 from markdown_d2._renderer import D2Error, Renderer, RendererError, node_command
+from markdown_d2._sources import prepare
 
 STAND_INS = Path(__file__).parent / "stand_ins"
 STEPS = "alpha_top\nsteps: {\n  1: { beta_first }\n  2: { gamma_second }\n}\n"
@@ -106,3 +107,21 @@ def test_raise_when_node_does_not_answer() -> None:
     with pytest.raises(RendererError, match="no answer within 0.5 s"):
         instance.boards({"index.d2": "a"})
     instance.close()
+
+
+def test_render_an_import_with_an_embedded_icon(
+    renderer: Renderer, tmp_path: Path
+) -> None:
+    """Render a diagram whose imported file carries an embedded icon."""
+    (tmp_path / "parts").mkdir()
+    (tmp_path / "parts" / "stage.d2").write_text(
+        "motor: { icon: cam.svg }\n", encoding="utf-8"
+    )
+    (tmp_path / "cam.svg").write_bytes(b'<svg xmlns="http://www.w3.org/2000/svg"/>')
+
+    svg = renderer.render(
+        prepare("stage: @parts/stage\n", tmp_path), "", "light", 0, 200, "s"
+    )
+
+    assert "motor" in svg
+    assert "data:image/svg+xml;base64," in svg
