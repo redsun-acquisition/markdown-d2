@@ -12,21 +12,21 @@ which diagram and which line, instead of showing a broken picture.
 
 ## A first diagram
 
-```d2 title="A session and its parts"
-session -> devices
-session -> presenters
-session -> views
-devices -> service: prefix
+```d2 title="A web request"
+browser -> server: HTTPS
+server -> cache: look up
+server -> database: query
+cache -> database: refresh
 ```
 
 Each example on this page is followed by the block that draws it:
 
 ````text
-```d2 title="A session and its parts"
-session -> devices
-session -> presenters
-session -> views
-devices -> service: prefix
+```d2 title="A web request"
+browser -> server: HTTPS
+server -> cache: look up
+server -> database: query
+cache -> database: refresh
 ```
 ````
 
@@ -39,22 +39,22 @@ D2 can split a diagram into steps, each adding to the one before. The
 picture then shows one step at a time, with buttons and the arrow keys to
 move between them:
 
-```d2 title="Building a session"
-config: read the configuration
+```d2 title="Publishing a site"
+pages: write the pages
 steps: {
-  1: { services: start the services; config -> services }
-  2: { devices: make the devices; services -> devices }
-  3: { views: show the views; devices -> views }
+  1: { build: build the site; pages -> build }
+  2: { check: check the links; build -> check }
+  3: { publish: publish it; check -> publish }
 }
 ```
 
 ````text
-```d2 title="Building a session"
-config: read the configuration
+```d2 title="Publishing a site"
+pages: write the pages
 steps: {
-  1: { services: start the services; config -> services }
-  2: { devices: make the devices; services -> devices }
-  3: { views: show the views; devices -> views }
+  1: { build: build the site; pages -> build }
+  2: { check: check the links; build -> check }
+  3: { publish: publish it; check -> publish }
 }
 ```
 ````
@@ -65,20 +65,20 @@ A `tooltip` shows when the reader points at a shape, and a `link` makes the
 shape clickable:
 
 ```d2
-stage: Stage {
-  tooltip: Moves the sample in X and Y
+server: Server {
+  tooltip: Answers requests from the browser
   link: https://d2lang.com/tour/interactive
 }
-camera -> stage: watches
+browser -> server: requests
 ```
 
 ````text
 ```d2
-stage: Stage {
-  tooltip: Moves the sample in X and Y
+server: Server {
+  tooltip: Answers requests from the browser
   link: https://d2lang.com/tour/interactive
 }
-camera -> stage: watches
+browser -> server: requests
 ```
 ````
 
@@ -103,16 +103,16 @@ model: |latex
 ## Imports and icons
 
 A diagram can import another `.d2` file and use icon files, both found under
-the `root` folder, which is `docs` for this site. Here `parts/stage.d2`
-holds a motor with a camera icon:
+the `root` folder, which is `docs` for this site. Here `parts/storage.d2`
+holds a database with an icon:
 
 ```d2
-stage: @parts/stage
+storage: @parts/storage
 ```
 
 ````text
 ```d2
-stage: @parts/stage
+storage: @parts/storage
 ```
 ````
 
