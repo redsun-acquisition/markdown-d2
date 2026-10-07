@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 ICON = re.compile(
     r'((?:^|(?<=[{;.]))\s*icon\s*:\s*)(?:"([^"\n]*)"|([^\s;}\n]+))', re.MULTILINE
 )
-IMPORT = re.compile(r"@([A-Za-z0-9_][\w./-]*)")
+IMPORT = re.compile(r'@(?:"([^"\n]+)"|([A-Za-z0-9_][\w./-]*))')
 TYPES = {
     ".svg": "image/svg+xml",
     ".png": "image/png",
@@ -91,7 +91,8 @@ def prepare(source: str, root: Path) -> dict[str, str]:
     waiting = [("index.d2", source)]
     while waiting:
         importer, text = waiting.pop()
-        for name in IMPORT.findall(text):
+        for quoted, plain in IMPORT.findall(text):
+            name = quoted or plain
             relative = (
                 posixpath.normpath(
                     posixpath.join(
