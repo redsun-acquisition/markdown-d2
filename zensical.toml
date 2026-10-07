@@ -1,10 +1,37 @@
 [project]
 site_name = "markdown-d2"
+site_description = "D2 diagrams for Python-Markdown and Zensical sites, drawn when the site is built."
 docs_dir = "docs"
 site_dir = "site"
+nav = [
+    "index.md",
+    { "Tutorial" = ["tutorials/first-diagram.md"] },
+    { "How-to guides" = [
+        "how-to/show-steps.md",
+        "how-to/import-files-and-icons.md",
+        "how-to/change-the-look.md",
+        "how-to/fix-a-broken-diagram.md",
+        "how-to/use-python-markdown.md",
+    ]},
+    { "Reference" = [
+        "reference/settings.md",
+        "reference/figure.md",
+        "reference/d2-features.md",
+        "reference/api.md",
+        "explanation/glossary.md",
+    ]},
+    { "Explanation" = ["explanation/how-it-works.md"] },
+]
 
 [project.theme]
 language = "en"
+features = [
+    "navigation.sections",
+    "navigation.footer",
+    "content.code.copy",
+    "content.tooltips",
+    "toc.follow",
+]
 
 [[project.theme.palette]]
 scheme = "slate"
@@ -14,7 +41,44 @@ toggle = { icon = "lucide/moon", name = "Switch to light mode" }
 scheme = "default"
 toggle = { icon = "lucide/sun", name = "Switch to dark mode" }
 
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["src"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "numpy"
+show_source = false
+docstring_section_style = "table"
+show_root_heading = true
+show_root_full_path = false
+show_signature_annotations = true
+separate_signature = true
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+md_in_html = {}
+tables = {}
+
+[project.markdown_extensions.toc]
+permalink = true
+toc_depth = 3
+
+[project.markdown_extensions.pymdownx.details]
+[project.markdown_extensions.pymdownx.highlight]
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.keys]
+
+# includes/abbreviations.md is appended to every page, so each entry underlines
+# every occurrence of its term on the site
+[project.markdown_extensions.pymdownx.snippets]
+auto_append = ["includes/abbreviations.md"]
+dedent_subsections = true
+check_paths = true
+
+# --8<-- [start:fence]
 [project.markdown_extensions.pymdownx.superfences]
 custom_fences = [
   { name = "d2", class = "d2", format = { object = "markdown_d2.formatter", kwds = { root = "docs" } }, validator = "markdown_d2.validator" },
 ]
+# --8<-- [end:fence]

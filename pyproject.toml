@@ -83,7 +83,10 @@ commands = [
 
 [tool.tox.env.docs]
 dependency_groups = ["dev", "docs"]
-commands = [["zensical", "build", "--strict", "--clean"]]
+commands = [
+    ["zensical", "build", "--strict", "--clean"],
+    ["zensical", "build", "--strict", "--clean", "-f", "examples/first-diagram/zensical.toml"],
+]
 
 [dependency-groups]
 dev = [
@@ -96,6 +99,7 @@ dev = [
     "types-markdown>=3.10.2.20261007",
 ]
 docs = [
+    "mkdocstrings-python>=2.0.9",
     "zensical>=0.0.68",
 ]
 lint = [
