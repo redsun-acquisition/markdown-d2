@@ -13,12 +13,31 @@ hooks = [
   { id = "check-merge-conflict" },
 ]
 
-# ruff runs from uv.lock rather than a pinned hook repo, so the hook, tox and
-# CI all run the same ruff version; --only-group keeps the sync to prek and ruff
+# ruff and Biome run from uv.lock and package-lock.json rather than pinned hook
+# repos, so the hooks, tox and CI all run the same versions
 [[repos]]
 repo = "local"
-hooks = [
-  { id = "ruff-check", name = "ruff check", language = "system", entry = "uv run --locked --only-group lint ruff check --fix --force-exclude", types_or = ["python", "pyi"], require_serial = true },
-  { id = "ruff-format", name = "ruff format", language = "system", entry = "uv run --locked --only-group lint ruff format --force-exclude", types_or = ["python", "pyi"], require_serial = true },
-  { id = "biome", name = "biome check", language = "system", entry = "uv run --locked python -m nodejs_wheel node_modules/@biomejs/biome/bin/biome check --write --no-errors-on-unmatched", files = "\\.m?ts$", require_serial = true },
-]
+
+[[repos.hooks]]
+id = "ruff-check"
+name = "ruff check"
+language = "system"
+entry = "uv run --locked --only-group lint ruff check --fix --force-exclude"
+types_or = ["python", "pyi"]
+require_serial = true
+
+[[repos.hooks]]
+id = "ruff-format"
+name = "ruff format"
+language = "system"
+entry = "uv run --locked --only-group lint ruff format --force-exclude"
+types_or = ["python", "pyi"]
+require_serial = true
+
+[[repos.hooks]]
+id = "biome"
+name = "biome check"
+language = "system"
+entry = "uv run --locked python -m nodejs_wheel node_modules/@biomejs/biome/bin/biome check --write"
+files = "\\.m?ts$"
+require_serial = true
