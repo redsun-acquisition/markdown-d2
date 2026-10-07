@@ -1,17 +1,32 @@
 import { createInterface } from "node:readline";
-import { D2 } from "@d2lang/d2";
 import type { CompileResponse, RenderOptions } from "@d2lang/d2";
+import { D2 } from "@d2lang/d2";
 
-interface Request {
+type Files = Record<string, string>;
+
+interface BoardsRequest {
   id: number;
-  op: "boards" | "render";
-  files: Record<string, string>;
-  board?: string;
-  variant?: "light" | "dark";
-  light_theme?: number;
-  dark_theme?: number;
-  salt?: string;
+  op: "boards";
+  files: Files;
 }
+
+interface RenderRequest {
+  id: number;
+  op: "render";
+  files: Files;
+  board: string;
+  variant: "light" | "dark";
+  light_theme: number;
+  dark_theme: number;
+  salt: string;
+}
+
+type Request = BoardsRequest | RenderRequest;
+
+type Reply =
+  | { id: number; boards: string[] }
+  | { id: number; svg: string }
+  | { id: number; error: string };
 
 interface Board {
   name: string;
@@ -24,7 +39,7 @@ const KINDS = ["layers", "scenarios", "steps"] as const;
 const d2 = new D2();
 let last: { key: string; compiled: CompileResponse } | null = null;
 
-async function compile(files: Record<string, string>): Promise<CompileResponse> {
+async function compile(files: Files): Promise<CompileResponse> {
   const key = JSON.stringify(files);
   if (last?.key !== key) {
     last = { key, compiled: await d2.compile({ fs: files, inputPath: "index.d2" }) };
@@ -43,7 +58,7 @@ function boardPaths(board: Board, prefix: string): string[] {
   return paths;
 }
 
-async function render(request: Request): Promise<string> {
+async function render(request: RenderRequest): Promise<string> {
   const { diagram, renderOptions } = await compile(request.files);
   const options: RenderOptions = { ...renderOptions, noXMLTag: true, salt: request.salt };
   // theme 0 is also D2's value when the source sets none, so the setting wins over it
@@ -57,7 +72,7 @@ async function render(request: Request): Promise<string> {
   return d2.render({ ...diagram, layers: [], scenarios: [], steps: [] }, options);
 }
 
-async function answer(request: Request): Promise<object> {
+async function answer(request: Request): Promise<Reply> {
   try {
     if (request.op === "boards") {
       const { diagram } = await compile(request.files);

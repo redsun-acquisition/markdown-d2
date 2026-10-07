@@ -1,4 +1,5 @@
-interface MarkdownD2Window extends Window {
+// biome-ignore lint/correctness/noUnusedVariables: it merges into the global Window
+interface Window {
   markdownD2Ready?: boolean;
   document$?: { subscribe(callback: () => void): void };
 }
@@ -25,7 +26,7 @@ function stepControls(
   counter.setAttribute("aria-live", "polite");
   const show = (index: number): void => {
     current = (index + boards.length) % boards.length;
-    const name = boards[current].dataset.name;
+    const name = boards[current]?.dataset.name;
     counter.textContent = `${current + 1} / ${boards.length}${name ? ` · ${name}` : ""}`;
     onStep(current);
   };
@@ -41,7 +42,10 @@ function stepControls(
   return { controls, show, current: () => current };
 }
 
-function stepWithKeys(element: HTMLElement, steps: { show: (index: number) => void; current: () => number }): void {
+function stepWithKeys(
+  element: HTMLElement,
+  steps: { show: (index: number) => void; current: () => number },
+): void {
   element.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft") steps.show(steps.current() - 1);
     if (event.key === "ArrowRight") steps.show(steps.current() + 1);
@@ -55,10 +59,14 @@ function setUpFigure(figure: HTMLElement): void {
   figure.tabIndex = 0;
   const boards = Array.from(figure.querySelectorAll<HTMLElement>(":scope > .markdown-d2-board"));
   const steps = stepControls(boards, 0, (current) => {
-    boards.forEach((board, i) => board.classList.toggle("markdown-d2-current", i === current));
+    for (const [i, board] of boards.entries()) {
+      board.classList.toggle("markdown-d2-current", i === current);
+    }
   });
   if (boards.length > 1) stepWithKeys(figure, steps);
-  steps.controls.append(button("Open full screen", "⛶", () => openDialog(boards, steps.current(), steps.show)));
+  steps.controls.append(
+    button("Open full screen", "⛶", () => openDialog(boards, steps.current(), steps.show)),
+  );
   figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
   steps.show(0);
 }
@@ -87,7 +95,11 @@ function openDialog(boards: HTMLElement[], start: number, onStep: (index: number
   stage.addEventListener("wheel", (event) => {
     event.preventDefault();
     const box = stage.getBoundingClientRect();
-    zoom(event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP, event.clientX - box.left, event.clientY - box.top);
+    zoom(
+      event.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP,
+      event.clientX - box.left,
+      event.clientY - box.top,
+    );
   });
   let dragging: { x: number; y: number } | null = null;
   stage.addEventListener("pointerdown", (event) => {
@@ -103,7 +115,9 @@ function openDialog(boards: HTMLElement[], start: number, onStep: (index: number
   stage.addEventListener("pointerup", () => (dragging = null));
 
   const steps = stepControls(boards, start, (current) => {
-    view.replaceChildren(...Array.from(boards[current].children).map((child) => child.cloneNode(true)));
+    view.replaceChildren(
+      ...Array.from(boards[current]?.children ?? [], (child) => child.cloneNode(true)),
+    );
     onStep(current);
   });
   if (boards.length > 1) stepWithKeys(dialog, steps);
@@ -131,10 +145,10 @@ function setUpFigures(): void {
 }
 
 (function start(): void {
-  const page = window as MarkdownD2Window;
-  if (page.markdownD2Ready) return;
-  page.markdownD2Ready = true;
-  if (page.document$) page.document$.subscribe(setUpFigures);
-  else if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", setUpFigures);
+  if (window.markdownD2Ready) return;
+  window.markdownD2Ready = true;
+  if (window.document$) window.document$.subscribe(setUpFigures);
+  else if (document.readyState === "loading")
+    document.addEventListener("DOMContentLoaded", setUpFigures);
   else setUpFigures();
 })();
