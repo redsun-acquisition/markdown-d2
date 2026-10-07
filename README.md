@@ -1,11 +1,10 @@
 # markdown-d2
 
-`markdown-d2` draws [D2](https://d2lang.com) diagrams in a Python-Markdown
-site. You write a diagram in a `d2` code block, and when the site is built the
-block becomes a picture, drawn twice so it follows the site's light and dark
-theme. A diagram with several steps gets buttons to move through them, with a
-fade or a morph from one step to the next, and any diagram can be opened full
-screen to zoom and pan.
+`markdown-d2` turns [D2](https://d2lang.com) diagrams into pictures in a site
+built with `zensical` or Python-Markdown. You write a diagram as text in a `d2`
+code block, and the build draws it, once for the light theme and once for the
+dark one. A diagram with several steps gets buttons to move through them, with
+a fade or a morph between steps, and any diagram can be opened full screen.
 
 Everything happens when the site is built, so your readers download no extra
 software. A broken diagram stops the build with a message naming the page, the
@@ -20,10 +19,9 @@ uv add markdown-d2
 The package brings its own Node through `nodejs-wheel-binaries`, so nothing
 else needs installing.
 
-## Use with Zensical
+## Use with zensical
 
-`markdown-d2` plugs into `pymdownx.superfences` as a custom fence. In
-`zensical.toml`:
+Add the fence to `zensical.toml`:
 
 ```toml
 [project.markdown_extensions.pymdownx.superfences]
@@ -32,49 +30,20 @@ custom_fences = [
 ]
 ```
 
-Zensical renders a page again only when the page itself changes. After you
-edit a file that a diagram imports, or an icon it uses, run
-`zensical build --clean` to see the change.
+Then write a diagram in any page:
 
-## Use with Python-Markdown
-
-```python
-import markdown
-import markdown_d2
-
-md = markdown.Markdown(
-    extensions=["pymdownx.superfences"],
-    extension_configs={
-        "pymdownx.superfences": {
-            "custom_fences": [
-                {
-                    "name": "d2",
-                    "class": "d2",
-                    "format": markdown_d2.formatter(),
-                    "validator": markdown_d2.validator,
-                }
-            ]
-        }
-    },
-)
-html = md.convert("```d2\na -> b\n```")
+````markdown
+```d2
+you -> page: write
+page -> site: build
 ```
+````
 
-## Settings
-
-Most settings belong to D2 itself and go in the diagram, in `d2-config`, such
-as the layout engine or sketch mode. The formatter takes these:
-
-| setting | default | meaning |
-| --- | --- | --- |
-| `root` | the folder the build runs in | where imports and icons are looked up |
-| `cache_dir` | `.cache/markdown-d2` | where drawn pictures are kept between builds; `None` keeps nothing |
-| `light_theme`, `dark_theme` | `0`, `200` | D2 theme numbers for the light and the dark picture |
-| `dark_selector` | `[data-md-color-scheme="slate"]` | the CSS selector under which the dark picture shows |
-| `errors` | `raise` | `raise` stops the build on a broken diagram; `show` draws the error in the page |
-| `timeout` | `60` | seconds to wait for one picture |
-| `node` | the Node of `nodejs-wheel-binaries` | the Node program that draws the pictures |
-| `transition` | `fade` | how a diagram changes between steps: `none`, `fade` or `morph`; a block can set its own with `transition="morph"` |
+The [documentation](docs/index.md) starts with a
+[tutorial](docs/tutorials/first-diagram.md), then shows how to step through
+diagrams, import files and icons, change the look and
+[use `markdown-d2` without `zensical`](docs/how-to/use-python-markdown.md),
+and lists every [setting](docs/reference/settings.md).
 
 ## Developing
 
