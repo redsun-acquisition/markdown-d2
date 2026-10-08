@@ -112,10 +112,10 @@ class Formatter:
             )
             parts.append(
                 f'<div class="markdown-d2-board" data-step="{step}" '
-                f'data-name="{html.escape(board.name)}">'
+                f'data-name="{html.escape(board.name)}">{text}'
                 f'<div class="markdown-d2-light">{unique_ids(board.light, md)}</div>'
                 f'<div class="markdown-d2-dark">{unique_ids(board.dark, md)}</div>'
-                f"{text}</div>"
+                "</div>"
             )
         title = options.get("title")
         label = f' aria-label="{html.escape(title)}"' if title else ""
