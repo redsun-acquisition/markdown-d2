@@ -261,17 +261,24 @@ def render_boards(
     files = prepare(source, settings.root)
     name = key(files, settings.light_theme, settings.dark_theme, *versions)
     cached = settings.cache.get(f"{name}.json")
-    if cached is None:
+    boards = read_boards(cached) if cached is not None else None
+    if boards is None:
         boards = renderer.draw(
             files, settings.light_theme, settings.dark_theme, name[:12]
         )
         settings.cache.put(f"{name}.json", json.dumps(boards))
-    else:
-        boards = [Board(*board) for board in json.loads(cached)]
     return [
         board._replace(light=sized(board.light), dark=sized(board.dark))
         for board in boards
     ]
+
+
+def read_boards(text: str) -> list[Board] | None:
+    """Return the boards a cache entry holds, or `None` for an entry of another shape."""
+    try:
+        return [Board(*board) for board in json.loads(text)]
+    except (TypeError, ValueError):
+        return None
 
 
 def sized(svg: str) -> str:
