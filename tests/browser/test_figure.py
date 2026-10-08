@@ -15,6 +15,10 @@ STEPS = (
     '```d2 title="Three steps"\nstart\nsteps: {\n  1: { middle }\n  2: { end }\n}\n```'
 )
 SCREENSHOTS = Path("test-results")
+LABELLED = (
+    '```d2\nlabel: "The start."\na\n'
+    'steps: {\n  1: { label: "One more box."; b }\n}\n```'
+)
 HOVER = (
     "```d2\nviews -> presenters\npresenters: { tooltip: Decides what happens and when. }\n"
     "presenters -> devices\n```"
@@ -164,3 +168,14 @@ def test_put_the_step_buttons_above_the_diagram(opened: Page) -> None:
     assert above(
         dialog.locator(".markdown-d2-controls"), dialog.locator(".markdown-d2-stage")
     )
+
+
+def test_change_the_text_with_the_step(open_page: Callable[..., Page]) -> None:
+    """Show only the current board's text, and switch it when stepping."""
+    tab = open_page(text=LABELLED)
+    figure = tab.locator("figure.markdown-d2")
+    text = figure.locator(".markdown-d2-text")
+
+    expect(text.filter(visible=True)).to_have_text("The start.")
+    figure.get_by_role("button", name="Next step").click()
+    expect(text.filter(visible=True)).to_have_text("One more box.")

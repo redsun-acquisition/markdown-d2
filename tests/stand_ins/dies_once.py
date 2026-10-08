@@ -16,7 +16,9 @@ for line in sys.stdin:
         json.dumps(
             {
                 "id": request["id"],
-                "boards": [{"name": "", "light": "<svg/>", "dark": "<svg/>"}],
+                "boards": [
+                    {"name": "", "light": "<svg/>", "dark": "<svg/>", "label": ""}
+                ],
             }
         ),
         flush=True,

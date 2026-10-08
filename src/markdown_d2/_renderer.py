@@ -37,6 +37,8 @@ class Board(NamedTuple):
     """SVG in the light theme."""
     dark: str
     """SVG in the dark theme."""
+    label: str
+    """The board's own label, shown as its text under the picture; empty when it has none."""
 
 
 class RendererError(Exception):
@@ -110,7 +112,12 @@ class Renderer:
             }
         )
         return [
-            Board(str(board["name"]), str(board["light"]), str(board["dark"]))
+            Board(
+                str(board["name"]),
+                str(board["light"]),
+                str(board["dark"]),
+                str(board["label"]),
+            )
             for board in reply["boards"]
         ]
 

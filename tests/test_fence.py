@@ -214,3 +214,11 @@ def test_mark_the_transition_between_steps(
     html = page(text, **settings)
 
     assert f'<figure class="markdown-d2" data-transition="{transition}">' in html
+
+
+def test_show_each_boards_label_under_it(page: Callable[..., str]) -> None:
+    """Put a board's label, escaped, under its pictures and leave unlabeled boards bare."""
+    html = page('```d2\nlabel: "first <step>"\na\nsteps: {\n  1: { b }\n}\n```')
+
+    assert '<p class="markdown-d2-text">first &lt;step&gt;</p>' in html
+    assert html.count('class="markdown-d2-text"') == 1
