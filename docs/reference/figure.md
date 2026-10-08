@@ -35,7 +35,7 @@ pair.
 | `markdown-d2-board` | one board |
 | `markdown-d2-current` | the board the reader sees |
 | `markdown-d2-light`, `markdown-d2-dark` | the light and the dark picture of a board |
-| `markdown-d2-controls` | the row of buttons, under the figure and in full screen |
+| `markdown-d2-controls` | the row of buttons above the picture, in the figure and in full screen |
 | `markdown-d2-counter` | the step counter, such as `2 / 4 (steps.1)` |
 | `markdown-d2-dialog` | the full-screen view |
 | `markdown-d2-stage`, `markdown-d2-view` | the area of the full-screen view the reader zooms and pans, and the diagram inside it |
@@ -54,7 +54,7 @@ pair.
 
 ## Controls
 
-Under the figure:
+Above the picture:
 
 | control | action |
 | --- | --- |
@@ -72,7 +72,7 @@ In the full-screen view:
 | drag | move the diagram |
 | Zoom in, Zoom out buttons | zoom by a factor of 1.25 around the top-left corner |
 | Reset zoom button (`1:1`) | return to the original size and place |
-| pointer on a shape or connection | the same as under the figure |
+| pointer on a shape or connection | the same as in the figure |
 | Close button, ++esc++ | close the view |
 
 Every button can be reached with ++tab++ and pressed with ++enter++ or

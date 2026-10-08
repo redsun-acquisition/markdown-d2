@@ -88,7 +88,7 @@ Add a second block to `docs/index.md`, below the first one:
 
 Save the file. The server builds the page again and the browser reloads it.
 
-Notice the buttons under the new picture and the counter between them, which
+Notice the buttons above the new picture and the counter between them, which
 reads `1 / 3`. Click the right arrow: a cup appears next to the kettle, and
 the counter moves on. The title you gave the block shows under the picture.
 
