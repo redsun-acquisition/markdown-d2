@@ -33,7 +33,7 @@ A `d2` block takes two options, written after `d2` on its first line:
 
 | option | meaning |
 | --- | --- |
-| `title` | caption under the picture, and the name screen readers announce for it |
+| `title` | caption above the picture, and the name screen readers announce for it |
 | `transition` | transition of this diagram, overriding the formatter's `transition` |
 
 Any other option stops the build with `unknown option "<name>"; set it in
