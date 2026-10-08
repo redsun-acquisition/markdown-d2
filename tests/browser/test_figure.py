@@ -15,6 +15,10 @@ STEPS = (
     '```d2 title="Three steps"\nstart\nsteps: {\n  1: { middle }\n  2: { end }\n}\n```'
 )
 SCREENSHOTS = Path("test-results")
+HOVER = (
+    "```d2\nviews -> presenters\npresenters: { tooltip: Decides what happens and when. }\n"
+    "presenters -> devices\n```"
+)
 ANIMATIONS = """() => document.getAnimations().map((animation) => {
   const keyframes = animation.effect.getKeyframes();
   return keyframes.some((frame) => frame.transform) ? "move" : "fade";
@@ -34,9 +38,11 @@ def open_page(
     page: Callable[..., str], browser: Browser, tmp_path: Path
 ) -> Callable[..., Page]:
     def open_steps(
-        motion: Literal["reduce", "no-preference"] = "no-preference", **settings: str
+        motion: Literal["reduce", "no-preference"] = "no-preference",
+        text: str = STEPS,
+        **settings: str,
     ) -> Page:
-        html = page(STEPS, **settings)
+        html = page(text, **settings)
         file = tmp_path / "index.html"
         file.write_text(f"<!doctype html><body>{html}</body>", encoding="utf-8")
         tab = browser.new_page(reduced_motion=motion)
@@ -109,3 +115,30 @@ def test_animate_the_change_of_step(
     figure.get_by_role("button", name="Next step").click()
 
     assert set(tab.evaluate(ANIMATIONS)) == kinds
+
+
+def test_highlight_a_shape_and_show_its_tooltip(open_page: Callable[..., Page]) -> None:
+    """Fade the other shapes and show the tooltip of the shape under the pointer."""
+    tab = open_page(text=HOVER)
+    shapes = tab.locator(
+        ".markdown-d2-current .markdown-d2-light svg.d2-svg > g:not(.appendix-icon)"
+    )
+
+    tab.locator(
+        ".markdown-d2-current .markdown-d2-light svg text", has_text="presenters"
+    ).hover()
+
+    tooltip = tab.locator(".markdown-d2-tooltip")
+    expect(tooltip).to_be_visible()
+    expect(tooltip).to_have_text("Decides what happens and when.")
+    expect(tab.locator(".markdown-d2-current .markdown-d2-light title")).to_have_count(
+        0
+    )
+    opacities = [
+        float(shapes.nth(i).evaluate("g => getComputedStyle(g).opacity"))
+        for i in range(shapes.count())
+    ]
+    assert max(opacities) == 1.0 and opacities.count(1.0) == 1
+
+    tab.mouse.move(0, 0)
+    expect(tooltip).to_be_hidden()
