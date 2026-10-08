@@ -1081,6 +1081,18 @@ pair.</p>
 <td><code>markdown-d2-error</code></td>
 <td>the box that replaces a broken diagram with <code>errors = "show"</code></td>
 </tr>
+<tr>
+<td><code>markdown-d2-focus</code></td>
+<td>a picture's <abbr title="Scalable Vector Graphics, a picture made of shapes that stays sharp at any size">SVG</abbr> while the pointer is on one of its shapes</td>
+</tr>
+<tr>
+<td><code>markdown-d2-hovered</code></td>
+<td>the shape or connection under the pointer</td>
+</tr>
+<tr>
+<td><code>markdown-d2-tooltip</code></td>
+<td>the box that shows a shape's tooltip</td>
+</tr>
 </tbody>
 </table>
 <h2 id="data-attributes">Data attributes<a class="headerlink" href="#data-attributes" title="Permanent link">&para;</a></h2>
@@ -1132,6 +1144,10 @@ pair.</p>
 <td>Open full screen button</td>
 <td>open the full-screen view at the current board</td>
 </tr>
+<tr>
+<td>pointer on a shape or connection</td>
+<td>fade every other shape and connection, and show the shape's tooltip next to the pointer</td>
+</tr>
 </tbody>
 </table>
 <p>In the full-screen view:</p>
@@ -1164,6 +1180,10 @@ pair.</p>
 <td>return to the original size and place</td>
 </tr>
 <tr>
+<td>pointer on a shape or connection</td>
+<td>the same as under the figure</td>
+</tr>
+<tr>
 <td>Close button, <span class="keys"><kbd class="key-escape">Esc</kbd></span></td>
 <td>close the view</td>
 </tr>
@@ -1171,8 +1191,9 @@ pair.</p>
 </table>
 <p>Every button can be reached with <span class="keys"><kbd class="key-tab">Tab</kbd></span> and pressed with <span class="keys"><kbd class="key-enter">Enter</kbd></span> or
 <span class="keys"><kbd class="key-space">Space</kbd></span>. A reader whose system asks for less motion sees every change of board at once.
-Without JavaScript, every board shows, one below the other, and the light and
-dark pictures still follow the site's mode.</p>
+Without JavaScript, every board shows, one below the other, the light and
+dark pictures still follow the site's mode, and the browser shows a shape's
+tooltip itself.</p>
 
 
 
