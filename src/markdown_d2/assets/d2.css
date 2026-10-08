@@ -4,11 +4,12 @@
 DARK_SELECTOR .markdown-d2 .markdown-d2-dark, DARK_SELECTOR .markdown-d2-dialog .markdown-d2-dark { display: block; }
 DARK_SELECTOR .markdown-d2 .markdown-d2-light, DARK_SELECTOR .markdown-d2-dialog .markdown-d2-light { display: none; }
 .markdown-d2.markdown-d2-ready { display: grid; grid-template-columns: minmax(0, 1fr); }
-.markdown-d2.markdown-d2-ready > .markdown-d2-board { grid-area: 1 / 1; }
+.markdown-d2.markdown-d2-ready > .markdown-d2-controls { grid-row: 1; }
+.markdown-d2.markdown-d2-ready > .markdown-d2-board { grid-area: 2 / 1; }
 .markdown-d2.markdown-d2-ready > .markdown-d2-board:not(.markdown-d2-current) { visibility: hidden; }
 .markdown-d2 .markdown-d2-board + .markdown-d2-board { margin-top: 1em; }
 .markdown-d2.markdown-d2-ready .markdown-d2-board + .markdown-d2-board { margin-top: 0; }
-.markdown-d2-controls { display: flex; gap: 0.5em; align-items: center; justify-content: center; margin-top: 0.5em; }
+.markdown-d2-controls { display: flex; gap: 0.5em; align-items: center; justify-content: center; margin-bottom: 0.5em; }
 .markdown-d2-controls button { display: inline-flex; align-items: center; justify-content: center; min-width: 2em; height: 2em; font: inherit; cursor: pointer; }
 .markdown-d2-controls button svg { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .markdown-d2-dialog { width: 95vw; height: 95vh; max-width: none; max-height: none; padding: 0; overflow: hidden; }
