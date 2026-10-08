@@ -12,13 +12,13 @@ first:
 
 ```html
 <figure class="markdown-d2" data-transition="fade" aria-label="Publishing a site">
+  <figcaption>Publishing a site</figcaption>
   <div class="markdown-d2-board" data-step="1" data-name="">
     <p class="markdown-d2-text">Everything starts with the kettle.</p>
     <div class="markdown-d2-light"><svg>...</svg></div>
     <div class="markdown-d2-dark"><svg>...</svg></div>
   </div>
   <div class="markdown-d2-board" data-step="2" data-name="steps.1">...</div>
-  <figcaption>Publishing a site</figcaption>
 </figure>
 ```
 

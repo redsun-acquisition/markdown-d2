@@ -157,12 +157,14 @@ def test_highlight_a_shape_and_show_its_tooltip(open_page: Callable[..., Page]) 
 
 
 def test_put_the_step_buttons_above_the_diagram(opened: Page) -> None:
-    """Show the step buttons above the picture, in the figure and in full screen."""
+    """Show the buttons, then the title, above the picture, and the buttons in full screen."""
     figure = opened.locator("figure.markdown-d2")
     controls = figure.locator(".markdown-d2-controls")
+    caption = figure.locator("figcaption")
     board = figure.locator(".markdown-d2-current")
 
-    assert above(controls, board)
+    assert above(controls, caption)
+    assert above(caption, board)
 
     figure.get_by_role("button", name="Open full screen").click()
     dialog = opened.locator("dialog.markdown-d2-dialog")

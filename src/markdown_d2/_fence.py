@@ -129,7 +129,7 @@ class Formatter:
         transition = options.get("transition", settings.transition)
         figure = (
             f'<figure class="markdown-d2" data-transition="{transition}"{label}>'
-            f"{''.join(parts)}{caption}</figure>"
+            f"{caption}{''.join(parts)}</figure>"
         )
         return assets_once(page, settings) + figure
 

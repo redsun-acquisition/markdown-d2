@@ -58,7 +58,7 @@ def test_render_a_page_then_serve_it_from_the_cache(
 
     assert html.count('<figure class="markdown-d2"') == 2
     assert 'aria-label="Build steps"' in html
-    assert "<figcaption>Build steps</figcaption>" in html
+    assert '<figcaption>Build steps</figcaption><div class="markdown-d2-board"' in html
     assert html.count('class="markdown-d2-board"') == 4
     assert 'data-name="steps.1"' in html and 'data-name="steps.2"' in html
     assert (

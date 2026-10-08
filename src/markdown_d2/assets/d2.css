@@ -5,7 +5,8 @@ DARK_SELECTOR .markdown-d2 .markdown-d2-dark, DARK_SELECTOR .markdown-d2-dialog 
 DARK_SELECTOR .markdown-d2 .markdown-d2-light, DARK_SELECTOR .markdown-d2-dialog .markdown-d2-light { display: none; }
 .markdown-d2.markdown-d2-ready { display: grid; grid-template-columns: minmax(0, 1fr); }
 .markdown-d2.markdown-d2-ready > .markdown-d2-controls { grid-row: 1; }
-.markdown-d2.markdown-d2-ready > .markdown-d2-board { grid-area: 2 / 1; }
+.markdown-d2.markdown-d2-ready > figcaption { grid-row: 2; }
+.markdown-d2.markdown-d2-ready > .markdown-d2-board { grid-area: 3 / 1; }
 .markdown-d2.markdown-d2-ready > .markdown-d2-board:not(.markdown-d2-current) { visibility: hidden; }
 .markdown-d2 .markdown-d2-board + .markdown-d2-board { margin-top: 1em; }
 .markdown-d2.markdown-d2-ready .markdown-d2-board + .markdown-d2-board { margin-top: 0; }
@@ -23,3 +24,4 @@ DARK_SELECTOR .markdown-d2 .markdown-d2-light, DARK_SELECTOR .markdown-d2-dialog
 .markdown-d2-tooltip[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) { .markdown-d2 svg.d2-svg > g, .markdown-d2-dialog svg.d2-svg > g { transition: none; } }
 .markdown-d2-text { margin: 0 auto 0.5em; max-width: 40em; text-align: center; }
+.markdown-d2 > figcaption { margin: 0 auto 0.5em; }
