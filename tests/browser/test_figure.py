@@ -171,11 +171,16 @@ def test_put_the_step_buttons_above_the_diagram(opened: Page) -> None:
 
 
 def test_change_the_text_with_the_step(open_page: Callable[..., Page]) -> None:
-    """Show only the current board's text, and switch it when stepping."""
+    """Show only the current board's text, between the buttons and the picture."""
     tab = open_page(text=LABELLED)
     figure = tab.locator("figure.markdown-d2")
     text = figure.locator(".markdown-d2-text")
 
     expect(text.filter(visible=True)).to_have_text("The start.")
+    assert above(figure.locator(".markdown-d2-controls"), text.filter(visible=True))
+    assert above(
+        text.filter(visible=True),
+        figure.locator(".markdown-d2-current .markdown-d2-light"),
+    )
     figure.get_by_role("button", name="Next step").click()
     expect(text.filter(visible=True)).to_have_text("One more box.")
