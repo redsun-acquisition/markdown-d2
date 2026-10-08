@@ -55,8 +55,9 @@ which do not.
 
 ## Add tooltips, links and formulas
 
-A `tooltip` shows when the reader points at a shape, and a `link` makes the
-shape clickable. A label written as LaTeX is typeset:
+A `tooltip` shows next to the pointer when the reader points at a shape, while
+the other shapes fade, and a `link` makes the shape clickable. A label written
+as LaTeX is typeset:
 
 ```d2
 server: Server {
