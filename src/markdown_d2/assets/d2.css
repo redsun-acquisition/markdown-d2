@@ -22,4 +22,4 @@ DARK_SELECTOR .markdown-d2 .markdown-d2-light, DARK_SELECTOR .markdown-d2-dialog
 .markdown-d2-tooltip { position: fixed; z-index: 10; max-width: 22rem; padding: 0.4em 0.6em; border-radius: 4px; font-size: 0.8rem; line-height: 1.4; pointer-events: none; background: var(--md-default-fg-color, #1e1e2e); color: var(--md-default-bg-color, #ffffff); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
 .markdown-d2-tooltip[hidden] { display: none; }
 @media (prefers-reduced-motion: reduce) { .markdown-d2 svg.d2-svg > g, .markdown-d2-dialog svg.d2-svg > g { transition: none; } }
-.markdown-d2-text { margin: 0.5em auto 0; max-width: 40em; text-align: center; }
+.markdown-d2-text { margin: 0 auto 0.5em; max-width: 40em; text-align: center; }
