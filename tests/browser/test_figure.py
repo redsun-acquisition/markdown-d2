@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Literal
 
 import pytest
-from playwright.sync_api import Browser, Page, expect, sync_playwright
+from playwright.sync_api import Browser, Locator, Page, expect, sync_playwright
 
 pytestmark = pytest.mark.browser
 
@@ -23,6 +23,13 @@ ANIMATIONS = """() => document.getAnimations().map((animation) => {
   const keyframes = animation.effect.getKeyframes();
   return keyframes.some((frame) => frame.transform) ? "move" : "fade";
 })"""
+
+
+def above(upper: Locator, lower: Locator) -> bool:
+    """Return whether *upper* ends before *lower* starts, from top to bottom."""
+    top, bottom = upper.bounding_box(), lower.bounding_box()
+    assert top is not None and bottom is not None
+    return top["y"] + top["height"] <= bottom["y"]
 
 
 @pytest.fixture
@@ -142,3 +149,18 @@ def test_highlight_a_shape_and_show_its_tooltip(open_page: Callable[..., Page]) 
 
     tab.mouse.move(0, 0)
     expect(tooltip).to_be_hidden()
+
+
+def test_put_the_step_buttons_above_the_diagram(opened: Page) -> None:
+    """Show the step buttons above the picture, in the figure and in full screen."""
+    figure = opened.locator("figure.markdown-d2")
+    controls = figure.locator(".markdown-d2-controls")
+    board = figure.locator(".markdown-d2-current")
+
+    assert above(controls, board)
+
+    figure.get_by_role("button", name="Open full screen").click()
+    dialog = opened.locator("dialog.markdown-d2-dialog")
+    assert above(
+        dialog.locator(".markdown-d2-controls"), dialog.locator(".markdown-d2-stage")
+    )

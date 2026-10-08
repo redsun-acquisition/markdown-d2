@@ -229,7 +229,7 @@ function setUpFigure(figure: HTMLElement): void {
       openDialog(boards, steps.current(), transition, steps.show),
     ),
   );
-  figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
+  figure.prepend(steps.controls);
   hoverable(figure, document.body);
   steps.show(0);
 }
@@ -302,7 +302,7 @@ function openDialog(
     }),
     button("Close", "close", () => dialog.close()),
   );
-  dialog.append(stage, steps.controls);
+  dialog.append(steps.controls, stage);
   // the tooltip lives in the dialog, which shows above everything outside it
   hoverable(view, dialog);
   dialog.addEventListener("close", () => dialog.remove());
