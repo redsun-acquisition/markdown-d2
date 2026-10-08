@@ -10,6 +10,14 @@ interface Request {
   salt: string;
 }
 
+// D2 returns the colour overrides of d2-config with the render options,
+// although its type for them leaves the two fields out
+type Overrides = Record<string, string | null> | null;
+type CompiledOptions = RenderOptions & {
+  themeOverrides?: Overrides;
+  darkThemeOverrides?: Overrides;
+};
+
 interface DrawnBoard {
   name: string;
   light: string;
@@ -44,7 +52,7 @@ function boardPaths(board: Board, prefix: string): string[] {
 
 async function draw(request: Request): Promise<DrawnBoard[]> {
   const { diagram, renderOptions } = await d2.compile({ fs: request.files, inputPath: "index.d2" });
-  const { darkThemeID, ...options } = renderOptions;
+  const { darkThemeID, darkThemeOverrides, ...options } = renderOptions as CompiledOptions;
   // theme 0 is also D2's value when the source sets none, so the setting wins over it
   const light = options.themeID || request.light_theme;
   const dark = darkThemeID ?? request.dark_theme;
@@ -53,16 +61,21 @@ async function draw(request: Request): Promise<DrawnBoard[]> {
   for (const [index, name] of ["", ...boardPaths(diagram as Board, "")].entries()) {
     // each SVG gets its own salt, so the class names its CSS selects differ
     // between boards and themes on one page
-    const svg = (themeID: number, variant: string): Promise<string> => {
-      const settings: RenderOptions = {
+    const svg = (themeID: number, overrides: Overrides | undefined, variant: string) => {
+      const settings: CompiledOptions = {
         ...options,
         noXMLTag: true,
         themeID,
+        themeOverrides: overrides ?? null,
         salt: `${request.salt}-${index}${variant}`,
       };
       return name ? d2.render(diagram, { ...settings, target: name }) : d2.render(top, settings);
     };
-    boards.push({ name, light: await svg(light, "l"), dark: await svg(dark, "d") });
+    boards.push({
+      name,
+      light: await svg(light, options.themeOverrides, "l"),
+      dark: await svg(dark, darkThemeOverrides, "d"),
+    });
   }
   return boards;
 }

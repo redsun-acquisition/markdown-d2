@@ -154,3 +154,17 @@ def test_report_a_repeated_d2_error_once(renderer: Renderer) -> None:
     assert caught.value.messages == [
         'index.d2:1:22: "animate-interval" is not a valid config'
     ]
+
+
+def test_apply_each_themes_own_overrides(renderer: Renderer) -> None:
+    """Give the light picture the theme overrides and the dark one the dark ones."""
+    source = (
+        "vars: {\n  d2-config: {\n"
+        '    theme-overrides: { B1: "#C62828" }\n'
+        '    dark-theme-overrides: { B1: "#EF5350" }\n'
+        "  }\n}\na -> b\n"
+    )
+    board = renderer.draw({"index.d2": source}, 0, 200, "s")[0]
+
+    assert "#C62828" in board.light and "#EF5350" not in board.light
+    assert "#EF5350" in board.dark and "#C62828" not in board.dark
