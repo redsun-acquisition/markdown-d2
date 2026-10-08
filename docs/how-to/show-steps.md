@@ -39,7 +39,7 @@ all three.
 
 ## Explain each step
 
-Give a board a `label`, and its text shows under the picture and changes as
+Give a board a `label`, and its text shows above the picture and changes as
 the reader steps. The top board takes its label at the start of the diagram,
 and each step, layer or scenario takes one inside its own map:
 
