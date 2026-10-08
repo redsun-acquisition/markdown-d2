@@ -20,6 +20,7 @@ type CompiledOptions = RenderOptions & {
 
 interface DrawnBoard {
   name: string;
+  label: string;
   light: string;
   dark: string;
 }
@@ -28,6 +29,7 @@ type Reply = { id: number; boards: DrawnBoard[] } | { id: number; error: string 
 
 interface Board {
   name: string;
+  root?: { label?: string };
   layers?: Board[];
   scenarios?: Board[];
   steps?: Board[];
@@ -37,14 +39,16 @@ const KINDS = ["layers", "scenarios", "steps"] as const;
 const PLAIN_NAME = /^[\w-]+$/;
 const d2 = new D2();
 
-function boardPaths(board: Board, prefix: string): string[] {
-  const paths: string[] = [];
+function boardPaths(board: Board, prefix: string): { path: string; label: string }[] {
+  const paths: { path: string; label: string }[] = [];
   for (const kind of KINDS) {
     for (const child of board[kind] ?? []) {
       // a name with a dot or a space is quoted, or D2 would split the path at it
       const name = PLAIN_NAME.test(child.name) ? child.name : JSON.stringify(child.name);
       const path = `${prefix}${kind}.${name}`;
-      paths.push(path, ...boardPaths(child, `${path}.`));
+      // D2 gives a board with no label of its own its name as the label
+      const label = child.root?.label === child.name ? "" : (child.root?.label ?? "");
+      paths.push({ path, label }, ...boardPaths(child, `${path}.`));
     }
   }
   return paths;
@@ -56,9 +60,13 @@ async function draw(request: Request): Promise<DrawnBoard[]> {
   // theme 0 is also D2's value when the source sets none, so the setting wins over it
   const light = options.themeID || request.light_theme;
   const dark = darkThemeID ?? request.dark_theme;
-  const top = { ...diagram, layers: [], scenarios: [], steps: [] };
+  const topBoard = { ...diagram, layers: [], scenarios: [], steps: [] };
   const boards: DrawnBoard[] = [];
-  for (const [index, name] of ["", ...boardPaths(diagram as Board, "")].entries()) {
+  const top = { path: "", label: (diagram as Board).root?.label ?? "" };
+  for (const [index, { path: name, label }] of [
+    top,
+    ...boardPaths(diagram as Board, ""),
+  ].entries()) {
     // each SVG gets its own salt, so the class names its CSS selects differ
     // between boards and themes on one page
     const svg = (themeID: number, overrides: Overrides | undefined, variant: string) => {
@@ -69,10 +77,13 @@ async function draw(request: Request): Promise<DrawnBoard[]> {
         themeOverrides: overrides ?? null,
         salt: `${request.salt}-${index}${variant}`,
       };
-      return name ? d2.render(diagram, { ...settings, target: name }) : d2.render(top, settings);
+      return name
+        ? d2.render(diagram, { ...settings, target: name })
+        : d2.render(topBoard, settings);
     };
     boards.push({
       name,
+      label,
       light: await svg(light, options.themeOverrides, "l"),
       dark: await svg(dark, darkThemeOverrides, "d"),
     });

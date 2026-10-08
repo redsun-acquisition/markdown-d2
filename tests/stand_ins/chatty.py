@@ -9,14 +9,21 @@ for line in sys.stdin:
     request = json.loads(line)
     print("D2 says hello", flush=True)
     print(
-        json.dumps({"id": -1, "boards": [{"name": "stale", "light": "", "dark": ""}]}),
+        json.dumps(
+            {
+                "id": -1,
+                "boards": [{"name": "stale", "light": "", "dark": "", "label": ""}],
+            }
+        ),
         flush=True,
     )
     print(
         json.dumps(
             {
                 "id": request["id"],
-                "boards": [{"name": "", "light": "<svg/>", "dark": "<svg/>"}],
+                "boards": [
+                    {"name": "", "light": "<svg/>", "dark": "<svg/>", "label": ""}
+                ],
             }
         ),
         flush=True,

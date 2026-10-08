@@ -105,11 +105,17 @@ class Formatter:
             raise SuperFencesException(message) from error
         parts = []
         for step, board in enumerate(boards, start=1):
+            text = (
+                f'<p class="markdown-d2-text">{html.escape(board.label)}</p>'
+                if board.label
+                else ""
+            )
             parts.append(
                 f'<div class="markdown-d2-board" data-step="{step}" '
                 f'data-name="{html.escape(board.name)}">'
                 f'<div class="markdown-d2-light">{unique_ids(board.light, md)}</div>'
-                f'<div class="markdown-d2-dark">{unique_ids(board.dark, md)}</div></div>'
+                f'<div class="markdown-d2-dark">{unique_ids(board.dark, md)}</div>'
+                f"{text}</div>"
             )
         title = options.get("title")
         label = f' aria-label="{html.escape(title)}"' if title else ""
@@ -255,16 +261,24 @@ def render_boards(
     files = prepare(source, settings.root)
     name = key(files, settings.light_theme, settings.dark_theme, *versions)
     cached = settings.cache.get(f"{name}.json")
-    if cached is None:
+    boards = read_boards(cached) if cached is not None else None
+    if boards is None:
         boards = renderer.draw(
             files, settings.light_theme, settings.dark_theme, name[:12]
         )
         settings.cache.put(f"{name}.json", json.dumps(boards))
-    else:
-        boards = [Board(*board) for board in json.loads(cached)]
     return [
-        Board(board.name, sized(board.light), sized(board.dark)) for board in boards
+        board._replace(light=sized(board.light), dark=sized(board.dark))
+        for board in boards
     ]
+
+
+def read_boards(text: str) -> list[Board] | None:
+    """Return the boards a cache entry holds, or `None` for an entry of another shape."""
+    try:
+        return [Board(*board) for board in json.loads(text)]
+    except (TypeError, ValueError):
+        return None
 
 
 def sized(svg: str) -> str:

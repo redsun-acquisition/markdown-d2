@@ -41,7 +41,7 @@ def test_draw_a_board_whose_name_has_a_dot(renderer: Renderer) -> None:
         {"index.d2": 'a\nlayers: { "v1.2": { inner } }\n'}, 0, 200, "s"
     )
 
-    assert boards[1] == Board('layers."v1.2"', boards[1].light, boards[1].dark)
+    assert boards[1].name == 'layers."v1.2"'
     assert "inner" in boards[1].light
 
 
@@ -91,7 +91,7 @@ def test_restart_node_once_after_a_crash(tmp_path: Path) -> None:
     instance = Renderer(command, timeout=10)
 
     assert instance.draw({"index.d2": "a"}, 0, 200, "s") == [
-        Board("", "<svg/>", "<svg/>")
+        Board("", "<svg/>", "<svg/>", "")
     ]
     instance.close()
 
@@ -168,3 +168,12 @@ def test_apply_each_themes_own_overrides(renderer: Renderer) -> None:
 
     assert "#C62828" in board.light and "#EF5350" not in board.light
     assert "#EF5350" in board.dark and "#C62828" not in board.dark
+
+
+def test_carry_each_boards_label(renderer: Renderer) -> None:
+    """Return the label of every board, empty where a board has none."""
+    source = 'label: "the whole build"\na\nscenarios: {\n  x: { label: "only x" }\n  y: { b }\n}\n'
+
+    boards = renderer.draw({"index.d2": source}, 0, 200, "s")
+
+    assert [board.label for board in boards] == ["the whole build", "only x", ""]

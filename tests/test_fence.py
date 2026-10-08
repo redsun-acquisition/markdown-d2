@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import json
 import pickle
 import re
 from collections.abc import Callable
@@ -214,3 +215,25 @@ def test_mark_the_transition_between_steps(
     html = page(text, **settings)
 
     assert f'<figure class="markdown-d2" data-transition="{transition}">' in html
+
+
+def test_show_each_boards_label_under_it(page: Callable[..., str]) -> None:
+    """Put a board's label, escaped, under its pictures and leave unlabeled boards bare."""
+    html = page('```d2\nlabel: "first <step>"\na\nsteps: {\n  1: { b }\n}\n```')
+
+    assert '<p class="markdown-d2-text">first &lt;step&gt;</p>' in html
+    assert html.count('class="markdown-d2-text"') == 1
+
+
+def test_draw_again_over_a_cache_entry_of_another_shape(
+    page: Callable[..., str], tmp_path: Path
+) -> None:
+    """Treat a cache entry an older version wrote as missing, and draw again."""
+    page("```d2\na -> b\n```")
+    for entry in (tmp_path / "cache").glob("*.json"):
+        boards = json.loads(entry.read_text(encoding="utf-8"))
+        entry.write_text(json.dumps([board[:3] for board in boards]), encoding="utf-8")
+
+    html = page("```d2\na -> b\n```")
+
+    assert html.count('<figure class="markdown-d2"') == 1
