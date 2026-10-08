@@ -14,7 +14,8 @@ not.
 - `icon`, from an SVG, PNG or JPEG file under the root
 - imports with `@`, quoted or not
 - `layers`, `scenarios` and `steps`, each board shown as a step
-- `vars.d2-config` settings: `theme-id`, `dark-theme-id`, `sketch`,
+- `vars.d2-config` settings: `theme-id`, `dark-theme-id`, `theme-overrides`,
+  `dark-theme-overrides`, `sketch`,
   `layout-engine` with `dagre` or `elk`, `pad` and `center`
 
 ## Not supported
