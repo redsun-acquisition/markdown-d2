@@ -239,3 +239,14 @@ def test_draw_again_over_a_cache_entry_of_another_shape(
     html = page("```d2\na -> b\n```")
 
     assert html.count('<figure class="markdown-d2"') == 1
+
+
+def test_scope_each_pictures_style_to_it(page: Callable[..., str]) -> None:
+    """Prefix the code block rules of each picture with that picture's class."""
+    html = page("```d2\ncode: |cpp\n  s = load(seq);\n|\n```")
+
+    roots = re.findall(r'<svg [^>]*class="(d2-[0-9]+)', html)
+    scopes = re.findall(r"[.](d2-[0-9]+) +[.](?:light|dark)-code *[{]", html)
+    assert len(roots) == 2
+    assert scopes == [roots[0], roots[0], roots[1], roots[1]]
+    assert not re.search(r"[}\[] *[.](?:light|dark)-code *[{]", html)

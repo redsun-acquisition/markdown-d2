@@ -26,6 +26,10 @@ TRANSITIONS = ("none", "fade", "morph")
 D2_POSITION = re.compile(r"^index\.d2:(\d+):(\d+):(.*)$", re.DOTALL)
 VIEW_BOX = re.compile(r'^<svg (?![^>]*\bwidth=)([^>]*?)viewBox="0 0 ([\d.]+) ([\d.]+)"')
 ID = re.compile(r'\bid="([^"]+)"')
+ROOT_CLASS = re.compile(r'<svg [^>]*\bclass="(d2-\d+)\b')
+STYLE = re.compile(
+    r"(<style[^>]*>\s*(?:<!\[CDATA\[)?)(.*?)((?:\]\]>)?\s*</style>)", re.DOTALL
+)
 
 
 @dataclass(frozen=True)
@@ -113,8 +117,10 @@ class Formatter:
             parts.append(
                 f'<div class="markdown-d2-board" data-step="{step}" '
                 f'data-name="{html.escape(board.name)}">{text}'
-                f'<div class="markdown-d2-light">{unique_ids(board.light, md)}</div>'
-                f'<div class="markdown-d2-dark">{unique_ids(board.dark, md)}</div>'
+                '<div class="markdown-d2-light">'
+                f"{unique_ids(scoped_styles(board.light), md)}</div>"
+                '<div class="markdown-d2-dark">'
+                f"{unique_ids(scoped_styles(board.dark), md)}</div>"
                 "</div>"
             )
         title = options.get("title")
@@ -313,6 +319,51 @@ def unique_ids(svg: str, md: Markdown) -> str:
     names = "|".join(re.escape(name) for name in sorted(ids, key=len, reverse=True))
     pattern = re.compile(rf"""(\bid="|url\(["']?#|href="#)({names})(?=["')])""")
     return pattern.sub(lambda match: f"{match[1]}{match[2]}-{count}", svg)
+
+
+def scoped_styles(svg: str) -> str:
+    """Return *svg* with every rule of its style blocks limited to the SVG itself.
+
+    A style block inside an inline SVG applies to the whole page, so a rule D2
+    writes without its `d2-<number>` class, such as the one choosing between
+    the light and the dark copy of a code block, would reach the other
+    picture of the board too.
+    """
+    root = ROOT_CLASS.search(svg)
+    if root is None:
+        return svg
+    scope = f".{root[1]}"
+    return STYLE.sub(
+        lambda match: match[1] + scoped_rules(match[2], scope) + match[3], svg
+    )
+
+
+def scoped_rules(css: str, scope: str) -> str:
+    """Return *css* with *scope* before each top-level selector that lacks it.
+
+    At-rules such as `@font-face` are copied as they are.
+    """
+    out = []
+    position = 0
+    while (opening := css.find("{", position)) != -1:
+        prelude = css[position:opening]
+        depth, end = 1, opening + 1
+        while depth and end < len(css):
+            depth += {"{": 1, "}": -1}.get(css[end], 0)
+            end += 1
+        if not prelude.strip().startswith("@"):
+            prelude = ",".join(
+                selector
+                if selector.strip().startswith(scope)
+                else selector.replace(
+                    selector.strip(), f"{scope} {selector.strip()}", 1
+                )
+                for selector in prelude.split(",")
+            )
+        out.append(prelude + css[opening:end])
+        position = end
+    out.append(css[position:])
+    return "".join(out)
 
 
 @functools.cache

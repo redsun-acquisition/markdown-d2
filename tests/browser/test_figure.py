@@ -14,6 +14,7 @@ pytestmark = pytest.mark.browser
 STEPS = (
     '```d2 title="Three steps"\nstart\nsteps: {\n  1: { middle }\n  2: { end }\n}\n```'
 )
+CODE = "```d2\ncode: |cpp\n  s = load(seq);\n|\n```"
 SCREENSHOTS = Path("test-results")
 LABELLED = (
     '```d2\nlabel: "The start."\na\n'
@@ -184,3 +185,15 @@ def test_change_the_text_with_the_step(open_page: Callable[..., Page]) -> None:
     )
     figure.get_by_role("button", name="Next step").click()
     expect(text.filter(visible=True)).to_have_text("One more box.")
+
+
+def test_show_the_code_of_the_page_theme(open_page: Callable[..., Page]) -> None:
+    """Show the light copy of a code block on a light page, the dark one on a dark page."""
+    tab = open_page(text=CODE)
+    board = tab.locator("figure.markdown-d2 .markdown-d2-current")
+
+    expect(board.locator(".light-code").filter(visible=True)).to_have_count(1)
+    expect(board.locator(".dark-code").filter(visible=True)).to_have_count(0)
+    tab.evaluate("document.body.setAttribute('data-md-color-scheme', 'slate')")
+    expect(board.locator(".dark-code").filter(visible=True)).to_have_count(1)
+    expect(board.locator(".light-code").filter(visible=True)).to_have_count(0)
