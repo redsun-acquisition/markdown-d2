@@ -37,6 +37,34 @@ If each picture should start from a blank page, use `layers` instead of
 D2 documentation on [composition](https://d2lang.com/tour/composition) shows
 all three.
 
+## Explain each step
+
+Give a board a `label`, and its text shows under the picture and changes as
+the reader steps. The top board takes its label at the start of the diagram,
+and each step, layer or scenario takes one inside its own map:
+
+```d2 title="Making tea" transition="fade"
+label: "Everything starts with the kettle."
+kettle
+steps: {
+  1: { label: "Pour the water once it boils."; cup; kettle -> cup }
+  2: { label: "Add the tea last."; tea; cup -> tea }
+}
+```
+
+````markdown
+```d2 title="Making tea" transition="fade"
+label: "Everything starts with the kettle."
+kettle
+steps: {
+  1: { label: "Pour the water once it boils."; cup; kettle -> cup }
+  2: { label: "Add the tea last."; tea; cup -> tea }
+}
+```
+````
+
+A board without a label shows no text.
+
 ## Choose the transition
 
 Each new step fades in, unless you pick another

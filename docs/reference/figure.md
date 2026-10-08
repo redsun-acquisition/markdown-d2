@@ -15,6 +15,7 @@ first:
   <div class="markdown-d2-board" data-step="1" data-name="">
     <div class="markdown-d2-light"><svg>...</svg></div>
     <div class="markdown-d2-dark"><svg>...</svg></div>
+    <p class="markdown-d2-text">Everything starts with the kettle.</p>
   </div>
   <div class="markdown-d2-board" data-step="2" data-name="steps.1">...</div>
   <figcaption>Publishing a site</figcaption>
@@ -35,6 +36,7 @@ pair.
 | `markdown-d2-board` | one board |
 | `markdown-d2-current` | the board the reader sees |
 | `markdown-d2-light`, `markdown-d2-dark` | the light and the dark picture of a board |
+| `markdown-d2-text` | the text of a board that has a `label`, under its picture |
 | `markdown-d2-controls` | the row of buttons above the picture, in the figure and in full screen |
 | `markdown-d2-counter` | the step counter, such as `2 / 4 (steps.1)` |
 | `markdown-d2-dialog` | the full-screen view |
