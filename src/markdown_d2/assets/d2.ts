@@ -110,6 +110,67 @@ function play(transition: Transition, container: Element, before: Map<string, DO
   }
 }
 
+function tooltipBox(host: Element): HTMLElement {
+  const found = host.querySelector<HTMLElement>(":scope > .markdown-d2-tooltip");
+  if (found) return found;
+  const box = document.createElement("div");
+  box.className = "markdown-d2-tooltip";
+  box.setAttribute("role", "tooltip");
+  box.hidden = true;
+  host.append(box);
+  return box;
+}
+
+function hoverable(container: HTMLElement, host: Element): void {
+  // the page shows its own tooltip at once, so the browser's slower one goes
+  for (const title of Array.from(container.querySelectorAll("svg.d2-svg > g > title"))) {
+    const group = title.parentElement;
+    if (group) group.dataset.tooltip = title.textContent ?? "";
+    title.remove();
+  }
+  const box = tooltipBox(host);
+  let hovered: SVGGElement | null = null;
+  const clear = (): void => {
+    hovered?.classList.remove("markdown-d2-hovered");
+    hovered?.ownerSVGElement?.classList.remove("markdown-d2-focus");
+    hovered = null;
+    box.hidden = true;
+  };
+  container.addEventListener("pointerover", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    let group = target?.closest<SVGGElement>("svg.d2-svg > g") ?? null;
+    // a tooltip icon stands for the shape whose tooltip it carries
+    if (group?.classList.contains("appendix-icon")) {
+      const text = group.dataset.tooltip;
+      group =
+        Array.from(group.parentElement?.children ?? []).find(
+          (sibling): sibling is SVGGElement =>
+            sibling instanceof SVGGElement &&
+            !sibling.classList.contains("appendix-icon") &&
+            sibling.dataset.tooltip === text,
+        ) ?? group;
+    }
+    if (group === hovered) return;
+    clear();
+    if (!group) return;
+    hovered = group;
+    group.classList.add("markdown-d2-hovered");
+    group.ownerSVGElement?.classList.add("markdown-d2-focus");
+    const text = group.dataset.tooltip;
+    if (text) {
+      box.textContent = text;
+      box.hidden = false;
+    }
+  });
+  container.addEventListener("pointermove", (event) => {
+    if (box.hidden) return;
+    const left = Math.min(event.clientX + 14, window.innerWidth - box.offsetWidth - 8);
+    box.style.left = `${Math.max(left, 8)}px`;
+    box.style.top = `${event.clientY + 18}px`;
+  });
+  container.addEventListener("pointerleave", clear);
+}
+
 function stepControls(
   boards: HTMLElement[],
   onStep: (index: number) => void,
@@ -169,6 +230,7 @@ function setUpFigure(figure: HTMLElement): void {
     ),
   );
   figure.insertBefore(steps.controls, figure.querySelector("figcaption"));
+  hoverable(figure, document.body);
   steps.show(0);
 }
 
@@ -241,6 +303,8 @@ function openDialog(
     button("Close", "close", () => dialog.close()),
   );
   dialog.append(stage, steps.controls);
+  // the tooltip lives in the dialog, which shows above everything outside it
+  hoverable(view, dialog);
   dialog.addEventListener("close", () => dialog.remove());
   document.body.append(dialog);
   steps.show(start);

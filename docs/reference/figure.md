@@ -40,6 +40,9 @@ pair.
 | `markdown-d2-dialog` | the full-screen view |
 | `markdown-d2-stage`, `markdown-d2-view` | the area of the full-screen view the reader zooms and pans, and the diagram inside it |
 | `markdown-d2-error` | the box that replaces a broken diagram with `errors = "show"` |
+| `markdown-d2-focus` | a picture's SVG while the pointer is on one of its shapes |
+| `markdown-d2-hovered` | the shape or connection under the pointer |
+| `markdown-d2-tooltip` | the box that shows a shape's tooltip |
 
 ## Data attributes
 
@@ -58,6 +61,7 @@ Under the figure:
 | Previous step, Next step buttons | show the board before or after, going round at the ends; present when the diagram has more than one board |
 | ++arrow-left++, ++arrow-right++ | the same, while the figure has focus |
 | Open full screen button | open the full-screen view at the current board |
+| pointer on a shape or connection | fade every other shape and connection, and show the shape's tooltip next to the pointer |
 
 In the full-screen view:
 
@@ -68,9 +72,11 @@ In the full-screen view:
 | drag | move the diagram |
 | Zoom in, Zoom out buttons | zoom by a factor of 1.25 around the top-left corner |
 | Reset zoom button (`1:1`) | return to the original size and place |
+| pointer on a shape or connection | the same as under the figure |
 | Close button, ++esc++ | close the view |
 
 Every button can be reached with ++tab++ and pressed with ++enter++ or
 ++space++. A reader whose system asks for less motion sees every change of board at once.
-Without JavaScript, every board shows, one below the other, and the light and
-dark pictures still follow the site's mode.
+Without JavaScript, every board shows, one below the other, the light and
+dark pictures still follow the site's mode, and the browser shows a shape's
+tooltip itself.
