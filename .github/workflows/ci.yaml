@@ -40,7 +40,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
       - run: uv run --locked playwright install --with-deps chromium
       - run: uv run --locked tox -e browser
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: screenshots
@@ -54,7 +54,7 @@ jobs:
       - run: uv run --locked tox -e docs
       # the publishing job deploys this site rather than building it again,
       # so what reaches the pages is what was checked
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: site
           path: site/
@@ -114,7 +114,7 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: test -f "dist/markdown_d2-${TAG#v}.tar.gz"
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
