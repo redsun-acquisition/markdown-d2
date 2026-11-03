@@ -56,6 +56,13 @@ The cache `zensical` keeps of whole pages, apart from the
 [cache](#cache) of pictures. It renders a page again when the page's text or
 the site's settings change, not when a file the page imports changes.
 
+## Port
+
+A small shape on the edge of a container in a diagram, where links start and
+end. A shape is one when it carries the class `port-left` or `port-right`, and
+`markdown-d2` moves it onto that edge of its container after D2 has laid the
+diagram out.
+
 ## Root
 
 The folder that imports and icons are found in. A block can only use files
