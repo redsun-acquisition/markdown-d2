@@ -36,6 +36,13 @@ export interface Diagram {
   steps?: Diagram[] | null;
 }
 
+interface Box {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
+
 interface Port {
   shape: Shape;
   block: Shape;
@@ -44,6 +51,10 @@ interface Port {
 
 // how far a link runs straight out of a port before it bends into its route
 const BEND = 40;
+const NAME_SIDES: Record<string, -1 | 1> = {
+  OUTSIDE_LEFT_MIDDLE: -1,
+  OUTSIDE_RIGHT_MIDDLE: 1,
+};
 const SIDES: Record<string, -1 | 1 | null> = {
   "port-left": -1,
   "port-right": 1,
@@ -86,6 +97,72 @@ function findPorts(diagram: Diagram): Map<string, Port> {
   return ports;
 }
 
+function groupBy(ports: Iterable<Port>, key: (port: Port) => string): Port[][] {
+  const groups = new Map<string, Port[]>();
+  for (const port of ports) {
+    const name = key(port);
+    groups.set(name, [...(groups.get(name) ?? []), port]);
+  }
+  return [...groups.values()];
+}
+
+function checkOverlaps(ports: Map<string, Port>): void {
+  for (const edge of groupBy(ports.values(), ({ block, side }) => `${side} ${block.id}`)) {
+    edge.sort((a, b) => a.shape.pos.y - b.shape.pos.y);
+    for (const [index, { shape, block, side }] of edge.entries()) {
+      const above = edge[index - 1]?.shape;
+      if (above !== undefined && shape.pos.y < above.pos.y + above.height + above.strokeWidth) {
+        const name = side < 0 ? "left" : "right";
+        refuse(
+          shape,
+          `overlaps port "${above.id}" on the ${name} edge of "${block.id}"; use direction: right`,
+        );
+      }
+    }
+  }
+}
+
+function nameBox({ shape }: Port): Box | undefined {
+  const dir = NAME_SIDES[shape.labelPosition];
+  if (dir === undefined) return undefined;
+  const border = shape.pos.x + shape.width / 2 + (dir * (shape.width + shape.strokeWidth)) / 2;
+  const far = border + dir * shape.labelWidth;
+  const middle = shape.pos.y + shape.height / 2;
+  return {
+    left: Math.min(border, far),
+    right: Math.max(border, far),
+    top: middle - shape.labelHeight / 2,
+    bottom: middle + shape.labelHeight / 2,
+  };
+}
+
+function checkNames(ports: Map<string, Port>): void {
+  for (const group of groupBy(ports.values(), ({ block }) => block.id)) {
+    const boxes: Box[] = [];
+    for (const port of group) {
+      const box = nameBox(port);
+      if (box === undefined) continue;
+      const { block, side } = port;
+      const crosses =
+        (side < 0 ? box.right > block.pos.x + block.width : box.left < block.pos.x) ||
+        boxes.some(
+          (other) =>
+            box.left < other.right &&
+            other.left < box.right &&
+            box.top < other.bottom &&
+            other.top < box.bottom,
+        );
+      if (crosses) {
+        refuse(
+          port.shape,
+          `its name crosses the edge of "${block.id}" or another port's name; shorten the name`,
+        );
+      }
+      boxes.push(box);
+    }
+  }
+}
+
 function joinEnd(route: Point[], port: Port, other: string, link: Connection): Point[] {
   const { shape, block, side } = port;
   if (route.length % 3 !== 1) refuse(shape, `unexpected route for connection "${link.id}"`);
@@ -114,6 +191,8 @@ function placeOnBoard(diagram: Diagram): void {
     // D2 refuses a shape position that is not a whole number
     shape.pos = { x: Math.round(edge - shape.width / 2), y: shape.pos.y };
   }
+  checkOverlaps(ports);
+  checkNames(ports);
   for (const link of diagram.connections) {
     const src = ports.get(link.src);
     if (src !== undefined) link.route = joinEnd(link.route, src, link.dst, link);

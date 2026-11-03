@@ -252,3 +252,57 @@ def test_meet_a_marker_filled_through_its_stroke(renderer: Renderer) -> None:
 
     assert_on_border(svg, start, "a.o", 1, 8)
     assert_on_border(svg, end, "b.i", -1, 8)
+
+
+def test_refuse_ports_that_overlap(renderer: Renderer) -> None:
+    """Refuse two ports that land on one spot, as they do without direction: right."""
+    source = (
+        DOT + "a: { o: {class: [dot; port-right]}; p: {class: [dot; port-right]} }\n"
+    )
+
+    with pytest.raises(D2Error, match=r"overlaps port .*use direction: right"):
+        renderer.draw({"index.d2": source}, 0, 200, "s")
+
+
+def test_refuse_a_name_that_crosses_the_far_edge(renderer: Renderer) -> None:
+    """Refuse a port whose name reaches past the other edge of its block."""
+    name = "a name that runs on for forty characters"
+    source = (
+        DOT
+        + "m: {\n  grid-columns: 1\n  width: 60\n"
+        + f'  p: "{name}" {{class: [dot; port-left]; label.near: outside-right-center}}\n'
+        + "}\n"
+    )
+
+    with pytest.raises(D2Error, match="shorten the name"):
+        renderer.draw({"index.d2": source}, 0, 200, "s")
+
+
+def test_fit_a_long_name(renderer: Renderer) -> None:
+    """Draw a block whose ports carry long names, with each port on its edge."""
+    source = (
+        DOT
+        + "direction: right\nm: {\n"
+        + '  devices: "devices: DeviceMapping" '
+        + "{class: [dot; port-left]; label.near: outside-right-center}\n"
+        + '  state: "state: Status" '
+        + "{class: [dot; port-right]; label.near: outside-left-center}\n"
+        + "}\n"
+    )
+    svg = draw(renderer, source)[""]
+
+    assert centre(svg, "m.devices")[0] == pytest.approx(edges(svg, "m")[0], abs=0.5)
+    assert centre(svg, "m.state")[0] == pytest.approx(edges(svg, "m")[1], abs=0.5)
+
+
+def test_keep_a_port_highlighted_in_a_scenario(renderer: Renderer) -> None:
+    """Keep a port on its edge on a scenario that replaces its classes."""
+    source = (
+        DOT
+        + "classes.current: {style.stroke-width: 4}\n"
+        + "m: { a: {class: [dot; port-left]}; b }\n"
+        + "scenarios: { hl: { m.a.class: [current; dot; port-left] } }\n"
+    )
+    svg = draw(renderer, source)["scenarios.hl"]
+
+    assert centre(svg, "m.a")[0] == pytest.approx(edges(svg, "m")[0], abs=0.5)
