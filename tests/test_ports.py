@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import base64
+import json
 import re
+import subprocess
 from collections.abc import Generator
+from pathlib import Path
+from typing import Any
 
 import pytest
 
-from markdown_d2._paths import default_node
+from markdown_d2._paths import PACKAGE, default_node
 from markdown_d2._renderer import D2Error, Renderer, node_command
 
 DOT = "classes: {dot: {shape: circle; width: 16; height: 16}}\n"
@@ -20,6 +24,7 @@ PAIR = (
     + "a.o -- b.i\n"
     + "steps: { 1: { c } }\n"
 )
+PLACE_PORTS = Path(__file__).with_name("place_ports.mts")
 ATTRIBUTE = re.compile(r'([\w-]+)="([^"]*)"')
 ESCAPES = str.maketrans(
     {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&#34;", "'": "&#39;"}
@@ -377,4 +382,89 @@ def test_go_around_the_container_for_a_link_behind_its_port(renderer: Renderer) 
     gap = (edges(svg, "p")[1], edges(svg, "v")[0])
     assert all(
         y > bottom for x, y in points(svg, "(p.i -- v.o)[0]") if gap[0] < x < gap[1]
+    )
+
+
+def shape(
+    name: str, x: int, y: int, width: int, height: int, classes: list[str] | None = None
+) -> dict[str, object]:
+    """Return a compiled shape, laid out at *x*, *y*, for a hand-built diagram."""
+    return {
+        "id": name,
+        "type": "rectangle",
+        "classes": classes,
+        "pos": {"x": x, "y": y},
+        "width": width,
+        "height": height,
+        "strokeWidth": 2,
+        "labelWidth": 20,
+        "labelHeight": 20,
+        "labelPosition": "OUTSIDE_TOP_CENTER"
+        if classes is None
+        else "INSIDE_MIDDLE_CENTER",
+    }
+
+
+def go_around(neighbours: list[dict[str, object]]) -> dict[str, Any]:
+    """Place a port whose link runs back across its container, among *neighbours*."""
+    diagram = {
+        "config": None,
+        "shapes": [
+            shape("p", 100, 100, 80, 200),
+            shape("p.i", 130, 150, 16, 16, ["port-left"]),
+            shape("t", 300, 150, 60, 40),
+            *neighbours,
+        ],
+        "connections": [
+            {
+                "id": "(p.i -> t)[0]",
+                "src": "p.i",
+                "dst": "t",
+                "isCurve": True,
+                "route": [
+                    {"x": 146, "y": 158},
+                    {"x": 200, "y": 158},
+                    {"x": 250, "y": 170},
+                    {"x": 300, "y": 170},
+                ],
+            }
+        ],
+    }
+    done = subprocess.run(
+        [str(default_node()), str(PLACE_PORTS), str(PACKAGE / "ports.mts")],
+        input=json.dumps(diagram),
+        capture_output=True,
+        text=True,
+        check=True,
+        timeout=60,
+    )
+    answer: dict[str, Any] = json.loads(done.stdout)
+    return answer
+
+
+@pytest.mark.parametrize(
+    ("neighbours", "line"),
+    [
+        ([], 320),
+        ([shape("b", 100, 340, 80, 40)], 310),
+        ([shape("b", 100, 305, 80, 40)], 60),
+    ],
+)
+def test_take_the_detour_where_there_is_room(
+    neighbours: list[dict[str, object]], line: int
+) -> None:
+    """Run a detour 20 px below, through the middle of a narrow gap, or over the title."""
+    answer = go_around(neighbours)
+
+    route = answer["diagram"]["connections"][0]["route"]
+    assert {point["y"] for point in route[4:8]} == {line}
+
+
+def test_refuse_a_detour_with_no_room() -> None:
+    """Refuse a detour when shapes close in on the container from both sides."""
+    answer = go_around([shape("a", 100, 50, 80, 26), shape("b", 100, 305, 80, 40)])
+
+    assert answer["error"] == (
+        'port "p.i": no room to take link "(p.i -> t)[0]" around "p"; '
+        "put the port on the right edge"
     )
