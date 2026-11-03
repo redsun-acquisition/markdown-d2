@@ -10,6 +10,7 @@ nav = [
     { "Tutorial" = ["tutorials/first-diagram.md"] },
     { "How-to guides" = [
         "how-to/show-steps.md",
+        "how-to/put-ports-on-a-container.md",
         "how-to/import-files-and-icons.md",
         "how-to/change-the-look.md",
         "how-to/fix-a-broken-diagram.md",

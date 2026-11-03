@@ -34,6 +34,13 @@ every [board](glossary.md#board) twice, once in the light
 [theme](glossary.md#theme) and once in the dark one. If Node dies, the
 formatter starts it again once before it gives up.
 
+Between laying a diagram out and drawing it, Node moves every
+[port](glossary.md#port) onto the edge of its container and redraws the end of
+each link that meets one. D2's layout keeps every shape inside its container,
+away from the border, so a port could not reach the edge any other way. Only
+those shapes and links change, and a diagram without ports is drawn exactly as
+D2 laid it out.
+
 Two pictures of every board could clash on one page, because an SVG names its
 parts with ids and its styles with class names, and the page shares both. So
 each picture gets names of its own. The formatter hands D2 a short text,

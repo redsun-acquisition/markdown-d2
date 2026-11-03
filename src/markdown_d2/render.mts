@@ -1,6 +1,8 @@
 import { createInterface } from "node:readline";
 import type { RenderOptions } from "@d2lang/d2";
 import { D2 } from "@d2lang/d2";
+import type { Diagram } from "./ports.mts";
+import { placePorts } from "./ports.mts";
 
 interface Request {
   id: number;
@@ -56,6 +58,7 @@ function boardPaths(board: Board, prefix: string): { path: string; label: string
 
 async function draw(request: Request): Promise<DrawnBoard[]> {
   const { diagram, renderOptions } = await d2.compile({ fs: request.files, inputPath: "index.d2" });
+  placePorts(diagram as Diagram);
   const { darkThemeID, darkThemeOverrides, ...options } = renderOptions as CompiledOptions;
   // theme 0 is also D2's value when the source sets none, so the setting wins over it
   const light = options.themeID || request.light_theme;
