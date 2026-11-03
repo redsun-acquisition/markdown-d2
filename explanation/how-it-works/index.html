@@ -426,6 +426,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../how-to/put-ports-on-a-container/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Put ports on a container's edge
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../how-to/import-files-and-icons/" class="md-nav__link">
         
   
@@ -1040,6 +1067,12 @@ drawing most diagrams. Each diagram is one request: D2 lays it out, then draws
 every <a href="../glossary/#board">board</a> twice, once in the light
 <a href="../glossary/#theme">theme</a> and once in the dark one. If Node dies, the
 formatter starts it again once before it gives up.</p>
+<p>Between laying a diagram out and drawing it, Node moves every
+<a href="../glossary/#port">port</a> onto the edge of its container and redraws the end of
+each link that meets one. D2's layout keeps every shape inside its container,
+away from the border, so a port could not reach the edge any other way. Only
+those shapes and links change, and a diagram without ports is drawn exactly as
+D2 laid it out.</p>
 <p>Two pictures of every board could clash on one page, because an <abbr title="Scalable Vector Graphics, a picture made of shapes that stays sharp at any size">SVG</abbr> names its
 parts with ids and its styles with class names, and the page shares both. So
 each picture gets names of its own. The formatter hands D2 a short text,

@@ -428,6 +428,33 @@
   
   
     <li class="md-nav__item">
+      <a href="../../how-to/put-ports-on-a-container/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+  Put ports on a container's edge
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+                
+              
+                
+                  
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../how-to/import-files-and-icons/" class="md-nav__link">
         
   
@@ -984,6 +1011,10 @@ not.</p>
 <li><code>icon</code>, from an <abbr title="Scalable Vector Graphics, a picture made of shapes that stays sharp at any size">SVG</abbr>, <abbr title="a picture file format">PNG</abbr> or <abbr title="a picture file format">JPEG</abbr> file under the root</li>
 <li>imports with <code>@</code>, quoted or not</li>
 <li><code>layers</code>, <code>scenarios</code> and <code>steps</code>, each board shown as a step</li>
+<li><a href="../../explanation/glossary/#port">ports</a>: a shape with the class
+  <code>port-left</code> or <code>port-right</code> moves onto that edge of its container, as
+  <a href="../../how-to/put-ports-on-a-container/">Put ports on a container's edge</a>
+  shows</li>
 <li><code>vars.d2-config</code> settings: <code>theme-id</code>, <code>dark-theme-id</code>, <code>theme-overrides</code>,
   <code>dark-theme-overrides</code>, <code>sketch</code>,
   <code>layout-engine</code> with <code>dagre</code> or <code>elk</code>, <code>pad</code> and <code>center</code></li>
@@ -1004,6 +1035,14 @@ not.</p>
 <tr>
 <td><code>layout-engine: tala</code></td>
 <td>TALA is a separate, paid layout engine that this package does not include</td>
+</tr>
+<tr>
+<td><code>port-top</code> and <code>port-bottom</code></td>
+<td>the build stops with <code>port-top and port-bottom are not supported yet; use port-left or port-right</code></td>
+</tr>
+<tr>
+<td>ports with <code>layout-engine: elk</code></td>
+<td>the build stops with <code>ports need the dagre layout; remove layout-engine: elk</code></td>
 </tr>
 <tr>
 <td>icons given as a <abbr title="a web address">URL</abbr></td>
