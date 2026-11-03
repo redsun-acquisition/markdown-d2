@@ -10,5 +10,7 @@ try {
   placePorts(diagram);
   process.stdout.write(JSON.stringify({ diagram }));
 } catch (error) {
-  process.stdout.write(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }));
+  process.stdout.write(
+    JSON.stringify({ error: error instanceof Error ? error.message : String(error) }),
+  );
 }
