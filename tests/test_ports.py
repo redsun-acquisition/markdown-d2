@@ -165,6 +165,17 @@ def test_use_the_inner_block_of_nested_blocks(renderer: Renderer) -> None:
             + "m: { shape: sequence_diagram; p: {class: [dot; port-left]}; q; p -> q }\n",
             "ports cannot sit on a sequence diagram",
         ),
+        (
+            "vars: {d2-config: {layout-engine: elk}}\n"
+            + DOT
+            + "layers: { l: { m: { p: {class: [dot; port-left]} } } }\n",
+            "ports need the dagre layout",
+        ),
+        (
+            DOT
+            + "g: { grid-columns: 2; p: {class: [dot; port-left]}; q }\ng.p -> g.q\n",
+            "a port cannot have a link that runs straight",
+        ),
     ],
 )
 def test_refuse_what_ports_do_not_support(
@@ -261,6 +272,20 @@ def test_refuse_ports_that_overlap(renderer: Renderer) -> None:
     )
 
     with pytest.raises(D2Error, match=r"overlaps port .*use direction: right"):
+        renderer.draw({"index.d2": source}, 0, 200, "s")
+
+
+def test_name_dashes_when_arrows_stack_the_containers(renderer: Renderer) -> None:
+    """Tell the author to write -- when arrows both ways stack two containers."""
+    source = (
+        DOT
+        + "direction: right\n"
+        + "p: { o: {class: [dot; port-right]}; i: {class: [dot; port-right]} }\n"
+        + "v: { i: {class: [dot; port-left]}; o: {class: [dot; port-left]} }\n"
+        + BOTH_WAYS
+    )
+
+    with pytest.raises(D2Error, match="write the links between containers with --"):
         renderer.draw({"index.d2": source}, 0, 200, "s")
 
 

@@ -76,7 +76,7 @@ function parentOf(shapes: Shape[], shape: Shape): Shape | undefined {
   return parent;
 }
 
-function findPorts(diagram: Diagram): Map<string, Port> {
+function findPorts(diagram: Diagram, engine: string | null | undefined): Map<string, Port> {
   const ports = new Map<string, Port>();
   for (const shape of diagram.shapes) {
     const kinds = (shape.classes ?? []).filter((name) => name in SIDES);
@@ -86,7 +86,7 @@ function findPorts(diagram: Diagram): Map<string, Port> {
     if (side === null || side === undefined) {
       refuse(shape, "port-top and port-bottom are not supported yet; use port-left or port-right");
     }
-    if (diagram.config?.layoutEngine === "elk") {
+    if (engine === "elk") {
       refuse(shape, "ports need the dagre layout; remove layout-engine: elk");
     }
     const block = parentOf(diagram.shapes, shape);
@@ -115,7 +115,7 @@ function checkOverlaps(ports: Map<string, Port>): void {
         const name = side < 0 ? "left" : "right";
         refuse(
           shape,
-          `overlaps port "${above.id}" on the ${name} edge of "${block.id}"; use direction: right`,
+          `overlaps port "${above.id}" on the ${name} edge of "${block.id}"; use direction: right and write the links between containers with --`,
         );
       }
     }
@@ -165,6 +165,12 @@ function checkNames(ports: Map<string, Port>): void {
 
 function joinEnd(route: Point[], port: Port, other: string, link: Connection): Point[] {
   const { shape, block, side } = port;
+  if (link.isCurve !== true) {
+    refuse(
+      shape,
+      `a port cannot have a link that runs straight, as "${link.id}" does into or out of a grid container`,
+    );
+  }
   if (route.length % 3 !== 1) refuse(shape, `unexpected route for connection "${link.id}"`);
   const dir = other.startsWith(`${block.id}.`) ? -side : side;
   // D2 pulls each end of a drawn path back by half the shape's stroke, so a
@@ -183,8 +189,8 @@ function joinEnd(route: Point[], port: Port, other: string, link: Connection): P
   return [end, { x: end.x + dir * BEND, y: end.y }, c2, ...tail];
 }
 
-function placeOnBoard(diagram: Diagram): void {
-  const ports = findPorts(diagram);
+function placeOnBoard(diagram: Diagram, engine: string | null | undefined): void {
+  const ports = findPorts(diagram, engine);
   if (ports.size === 0) return;
   for (const { shape, block, side } of ports.values()) {
     const edge = side < 0 ? block.pos.x : block.pos.x + block.width;
@@ -202,13 +208,14 @@ function placeOnBoard(diagram: Diagram): void {
   }
 }
 
-export function placePorts(diagram: Diagram): void {
-  placeOnBoard(diagram);
+// only the top board carries the d2-config, so its layout engine is passed down
+export function placePorts(diagram: Diagram, engine = diagram.config?.layoutEngine): void {
+  placeOnBoard(diagram, engine);
   for (const board of [
     ...(diagram.layers ?? []),
     ...(diagram.scenarios ?? []),
     ...(diagram.steps ?? []),
   ]) {
-    placePorts(board);
+    placePorts(board, engine);
   }
 }

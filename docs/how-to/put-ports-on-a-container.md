@@ -60,7 +60,7 @@ its file.
     `direction: right` makes D2 stack the ports of a container in one column.
     Without it, D2 puts them in one row, so they land on one spot once they
     move to the edge, and the build stops with
-    `overlaps port ...; use direction: right`. The build also stops when the
+    a message that starts with `overlaps port`. The build also stops when the
     diagram picks the `elk` [layout engine](../explanation/glossary.md#layout-engine),
     because ports work only with `dagre`, D2's default.
 
