@@ -120,6 +120,11 @@ other, with links that cross.
 The side of a port is yours to choose and says nothing about which way data
 moves: a port on the left edge can start a link as well as end one.
 
+When a link leaves its port facing away from its other end, as a feedback
+link does, it runs around the container, below it unless the link goes on
+above. If another shape leaves no room, the build stops and names the edge to
+move the port to.
+
 ## Highlight a port in a scenario
 
 A scenario or a step that gives a port a class replaces the port's classes

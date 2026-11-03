@@ -35,6 +35,14 @@ FAN = (
     + "steps: { 1: { c } }\n"
 )
 BOTH_WAYS = "p.o -> v.i\nv.o -> p.i\n"
+FEEDBACK = (
+    DOT
+    + "direction: right\n"
+    + "p: { i: {class: [dot; port-left]}; o: {class: [dot; port-right]} }\n"
+    + "v: { i: {class: [dot; port-left]}; o: {class: [dot; port-right]} }\n"
+    + "p.o -- v.i\n"
+    + "p.i -- v.o\n"
+)
 
 
 @pytest.fixture
@@ -96,6 +104,28 @@ def ends(svg: str, link: str) -> tuple[tuple[float, float], tuple[float, float]]
     """Return the first and last point of the path drawn for *link*."""
     route = points(svg, link)
     return route[0], route[-1]
+
+
+def inside(svg: str, link: str, name: str) -> list[tuple[float, float]]:
+    """Return the points along the path of *link* that lie inside the shape *name*."""
+    route = points(svg, link)
+    x, y, width, height = box(svg, name)
+    found = []
+    for start in range(0, len(route) - 3, 3):
+        a, b, c, d = route[start : start + 4]
+        for step in range(1, 40):
+            t = step / 40
+            px, py = (
+                (1 - t) ** 3 * a[i]
+                + 3 * (1 - t) ** 2 * t * b[i]
+                + 3 * (1 - t) * t**2 * c[i]
+                + t**3 * d[i]
+                for i in (0, 1)
+            )
+            # the 2 px margin lets a link end on a marker that sits on the edge
+            if x + 2 < px < x + width - 2 and y + 2 < py < y + height - 2:
+                found.append((px, py))
+    return found
 
 
 def assert_on_border(
@@ -197,28 +227,26 @@ def test_meet_each_port_at_its_border(renderer: Renderer) -> None:
 
 @pytest.mark.parametrize("v_side", [-1, 1])
 def test_join_links_that_run_back(renderer: Renderer, v_side: int) -> None:
-    """Leave each port away from its block when two blocks link both ways."""
+    """Keep each link out of its ports' blocks when two blocks link both ways."""
     v_class = "port-left" if v_side < 0 else "port-right"
+    links = ("p.o -- v.i", "p.i -- v.o")
     source = (
         DOT
+        + "direction: right\n"
         + "p: { o: {class: [dot; port-right]}; i: {class: [dot; port-right]} }\n"
         + f"v: {{ i: {{class: [dot; {v_class}]}}; o: {{class: [dot; {v_class}]}} }}\n"
-        + BOTH_WAYS
+        + "".join(f"{link}\n" for link in links)
     )
     svg = draw(renderer, source)[""]
     sides = {"p": 1, "v": v_side}
 
-    for link in BOTH_WAYS.splitlines():
-        src, dst = link.split(" -> ")
-        route = points(svg, f"({link})[0]")
-        for port, end, nearest, slack in (
-            (src, route[0], route[1], 3),
-            (dst, route[-1], route[-2], 6),
-        ):
+    for link in links:
+        src, dst = link.split(" -- ")
+        start, end = ends(svg, f"({link})[0]")
+        for port, point in ((src, start), (dst, end)):
             block = port.split(".")[0]
-            assert_on_border(svg, end, port, sides[block], DOT_BORDER, slack)
-            left, right = edges(svg, block)
-            assert nearest[0] > right if sides[block] > 0 else nearest[0] < left
+            assert_on_border(svg, point, port, sides[block], DOT_BORDER)
+            assert inside(svg, f"({link})[0]", block) == []
 
 
 def test_join_inward_to_a_shape_in_the_same_block(renderer: Renderer) -> None:
@@ -331,3 +359,22 @@ def test_keep_a_port_highlighted_in_a_scenario(renderer: Renderer) -> None:
     svg = draw(renderer, source)["scenarios.hl"]
 
     assert centre(svg, "m.a")[0] == pytest.approx(edges(svg, "m")[0], abs=0.5)
+
+
+def test_go_around_the_container_for_a_link_behind_its_port(renderer: Renderer) -> None:
+    """Take a feedback link around both containers instead of through them."""
+    svg = draw(renderer, FEEDBACK)[""]
+    start, end = ends(svg, "(p.i -- v.o)[0]")
+
+    assert_on_border(svg, start, "p.i", -1, DOT_BORDER)
+    assert_on_border(svg, end, "v.o", 1, DOT_BORDER)
+    for link in ("(p.i -- v.o)[0]", "(p.o -- v.i)[0]"):
+        assert inside(svg, link, "p") == []
+        assert inside(svg, link, "v") == []
+    bottom = max(
+        box(svg, "p")[1] + box(svg, "p")[3], box(svg, "v")[1] + box(svg, "v")[3]
+    )
+    gap = (edges(svg, "p")[1], edges(svg, "v")[0])
+    assert all(
+        y > bottom for x, y in points(svg, "(p.i -- v.o)[0]") if gap[0] < x < gap[1]
+    )
